@@ -1,8 +1,13 @@
 menu "App config"
 
+config GOLBAL_CONFIG_FILENAME
+	string "Golbal Config FileName"
+	default "config.json"
+
 config LWIP_TFTPD_ON_BOOT
         bool "Start TFTPD  On Boot"
 	default y
+
 
 
 choice ESP_SMARTCONFIG_TYPE

@@ -7,6 +7,10 @@
 #include "esp_event.h"
 #include "nvs_flash.h"
 #include "tftpd.h"
+#include "cJSON.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
 
 
 
@@ -59,6 +63,51 @@ static void init_spiffs()
 }
 
 
+
+//全局配置文件json
+static cJSON * golbalconfig=NULL;
+
+void init_json()
+{
+    {
+        //采用FreeRTOS的分配函数(方便修改)
+        cJSON_Hooks cjson_hook=
+        {
+            pvPortMalloc,
+            vPortFree
+        };
+        cJSON_InitHooks(&cjson_hook);
+    }
+    {
+        //加载文件内容
+        FILE * fp=fopen(CONFIG_GOLBAL_CONFIG_FILENAME,"r");
+        if(fp!=NULL)
+        {
+            fseek(fp,0,SEEK_END);
+
+            size_t length=ftell(fp);
+
+            char *buff=pvPortMalloc(length+1);
+
+            memset(buff,0,length+1);
+
+            fseek(fp,0,SEEK_SET);
+
+            fread(buff,1,length,fp);
+
+            golbalconfig=cJSON_ParseWithLength(buff,length);
+
+            vPortFree(buff);
+
+            fclose(fp);
+        }
+    }
+
+    if(golbalconfig==NULL)
+    {
+        golbalconfig=cJSON_Parse(DEFAULT_GOLBAL_CONFIG_JSON);
+    }
+}
 //初始化
 void system_init()
 {
@@ -72,8 +121,89 @@ void system_init()
     init_spiffs();
 
 
+    init_json();
+
 #if CONFIG_LWIP_TFTPD_ON_BOOT == 1
     tftpd_start();
 #endif // LWIP_TFTPD_ON_BOOT
+
+}
+
+void system_config_save()
+{
+    if(golbalconfig==NULL)
+    {
+        return;
+    }
+
+    FILE *fp=fopen(CONFIG_GOLBAL_CONFIG_FILENAME,"w");
+    if(fp!=NULL)
+    {
+        char * buff=cJSON_Print(golbalconfig);
+
+        fwrite(buff,strlen(buff),1,fp);
+
+        cJSON_free(buff);
+
+        fclose(fp);
+    }
+}
+
+void system_config_put_item(cJSON *item,const char * name)
+{
+    if(golbalconfig==NULL)
+    {
+        return;
+    }
+
+    if(item==NULL)
+    {
+        return ;
+    }
+
+    if(name == NULL || strlen(name)==0)
+    {
+        return;
+    }
+
+    vTaskSuspendAll();
+
+    if(cJSON_HasObjectItem(golbalconfig,name))
+    {
+        cJSON_DeleteItemFromObject(golbalconfig,name);
+    }
+
+    cJSON *obj=cJSON_Duplicate(item,1);
+
+    cJSON_AddObjectToObject(obj,name);
+
+    xTaskResumeAll();
+}
+
+cJSON * system_config_get_item(const char *name)
+{
+
+    if(golbalconfig==NULL)
+    {
+        return NULL;
+    }
+
+    if(name == NULL || strlen(name)==0)
+    {
+        return NULL;
+    }
+
+    vTaskSuspendAll();
+
+    if(cJSON_HasObjectItem(golbalconfig,name))
+    {
+        return cJSON_CreateObjectReference(cJSON_GetObjectItem(golbalconfig,name));
+    }
+    else
+    {
+        return NULL;
+    }
+
+    xTaskResumeAll();
 
 }
