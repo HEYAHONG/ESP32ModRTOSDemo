@@ -8,7 +8,36 @@ config LWIP_TFTPD_ON_BOOT
         bool "Start TFTPD  On Boot"
 	default y
 
+menuconfig WIFI_NETWORK
+	bool "Enable WIFI network"
+	default y
 
+if  WIFI_NETWORK
+
+choice WIFI_NETWORK_TYPE
+	bool "WIFI network type"
+	default WIFI_NETWORK_STA
+config	WIFI_NETWORK_STA
+	bool "STA"
+config  WIFI_NETWORK_SOFTAP
+	bool "SoftAP"
+
+endchoice
+
+config WIFI_NETWORK_AP_SSID
+	string "WIFI AP ssid(default)"
+	default "Test"
+
+config WIFI_NETWORK_AP_PASSWORD
+	string "WIFI AP password(default)"
+	default "12345678"
+
+menuconfig WIFI_NETWORK_SMARTCONFIG
+	bool "Enable SmartConfig if WIFI_STA failed"
+	default y
+	depends on  WIFI_NETWORK_STA
+
+if  WIFI_NETWORK_SMARTCONFIG
 
 choice ESP_SMARTCONFIG_TYPE
 	prompt "Smartconfig Type"
@@ -34,5 +63,9 @@ config ESP_SMARTCONFIG_TYPE
 	default 1 if AIRKISS
 	default 2 if ESP_TOUCH-AIRKISS
 	default 3 if ESP_TOUCH_V2
+
+endif
+
+endif
 
 endmenu
