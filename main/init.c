@@ -202,7 +202,7 @@ cJSON * system_config_get_item(const char *name)
 
     if(cJSON_HasObjectItem(golbalconfig,name))
     {
-        return cJSON_CreateObjectReference(cJSON_GetObjectItem(golbalconfig,name));
+        return cJSON_Duplicate(cJSON_GetObjectItem(golbalconfig,name),1);
     }
     else
     {
