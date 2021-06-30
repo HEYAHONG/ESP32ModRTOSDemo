@@ -80,7 +80,7 @@ void init_json()
     }
     {
         //加载文件内容
-        FILE * fp=fopen(CONFIG_GOLBAL_CONFIG_FILENAME,"r");
+        FILE * fp=fopen("/spiffs/"CONFIG_GOLBAL_CONFIG_FILENAME,"r");
         if(fp!=NULL)
         {
             fseek(fp,0,SEEK_END);
@@ -136,7 +136,7 @@ void system_config_save()
         return;
     }
 
-    FILE *fp=fopen(CONFIG_GOLBAL_CONFIG_FILENAME,"w");
+    FILE *fp=fopen("/spiffs/"CONFIG_GOLBAL_CONFIG_FILENAME,"w");
     if(fp!=NULL)
     {
 
