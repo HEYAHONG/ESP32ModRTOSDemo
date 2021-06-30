@@ -139,7 +139,12 @@ void system_config_save()
     FILE *fp=fopen(CONFIG_GOLBAL_CONFIG_FILENAME,"w");
     if(fp!=NULL)
     {
+
+        vTaskSuspendAll();
+
         char * buff=cJSON_Print(golbalconfig);
+
+        xTaskResumeAll();
 
         fwrite(buff,strlen(buff),1,fp);
 
