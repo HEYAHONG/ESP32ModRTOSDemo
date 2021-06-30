@@ -101,6 +101,10 @@ void init_json()
 
             fclose(fp);
         }
+        else
+        {
+            ESP_LOGI(TAG,"Load "CONFIG_GOLBAL_CONFIG_FILENAME"from spiffs failed!");
+        }
     }
 
     if(golbalconfig==NULL)
