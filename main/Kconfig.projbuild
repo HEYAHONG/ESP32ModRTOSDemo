@@ -16,21 +16,37 @@ if  WIFI_NETWORK
 
 choice WIFI_NETWORK_TYPE
 	bool "WIFI network type"
-	default WIFI_NETWORK_STA
+	default WIFI_NETWORK_SOFTAPSTA
 config	WIFI_NETWORK_STA
 	bool "STA"
 config  WIFI_NETWORK_SOFTAP
 	bool "SoftAP"
+
+config  WIFI_NETWORK_SOFTAPSTA
+	bool "SoftAP + STA"
 
 endchoice
 
 config WIFI_NETWORK_AP_SSID
 	string "WIFI AP ssid(default)"
 	default "Test"
+	depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_SOFTAP
 
 config WIFI_NETWORK_AP_PASSWORD
 	string "WIFI AP password(default)"
 	default "12345678"
+	 depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_SOFTAP
+
+config WIFI_NETWORK_ROUTER_AP_SSID
+	string "WIFI Router ssid(default)"
+	default "TestRouter"
+	 depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_STA
+
+config  WIFI_NETWORK_ROUTER_AP_PASSWORD
+	string "WIFI Router password(default)"
+	default "12345678"
+	depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_STA
+
 
 menuconfig WIFI_NETWORK_SMARTCONFIG
 	bool "Enable SmartConfig if WIFI_STA failed"

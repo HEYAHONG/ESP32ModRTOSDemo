@@ -9,7 +9,7 @@
 #include "sdkconfig.h"
 #include "appconfig.h"
 #include "init.h"
-
+#include "wifinetwork.h"
 
 static const char *TAG = "esp32 main";
 
@@ -18,7 +18,9 @@ static void main_task ()
 
     system_init();
 
-
+#if CONFIG_WIFI_NETWORK == 1
+    wifinetwork_init();
+#endif // CONFIG_WIFI_NETWORK
 
     ESP_LOGI(TAG,"FreeMemory:%d Bytes",esp_get_minimum_free_heap_size());
 

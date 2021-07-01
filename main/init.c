@@ -103,7 +103,7 @@ void init_json()
         }
         else
         {
-            ESP_LOGI(TAG,"Load "CONFIG_GOLBAL_CONFIG_FILENAME"from spiffs failed!");
+            ESP_LOGI(TAG,"Load "CONFIG_GOLBAL_CONFIG_FILENAME" from spiffs failed!");
         }
     }
 

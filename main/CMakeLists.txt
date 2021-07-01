@@ -1,4 +1,4 @@
-set(COMPONENT_SRCS "main.c"  "tftpd.c" "init.c")
+set(COMPONENT_SRCS "main.c"  "tftpd.c" "init.c" "wifinetwork.c")
 set(COMPONENT_ADD_INCLUDEDIRS "." )
 
 #默认框架中为启用tftp,在此处启用
