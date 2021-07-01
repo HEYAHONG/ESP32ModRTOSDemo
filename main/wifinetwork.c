@@ -119,8 +119,11 @@ static void wifinetwork_sta_init()
         }
     }
 
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
-
+    if(strlen((char *)wifi_config.sta.ssid)!=0)
+    {
+        wifinetworkstate.station_is_enable=true;
+        ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
+    }
 }
 
 #endif // CONFIG_WIFI_NETWORK_SOFTAP
@@ -204,11 +207,15 @@ static void wifinetwork_ap_init()
         }
     }
 
-    if (strlen(CONFIG_WIFI_NETWORK_AP_PASSWORD) == 0)
+    if (strlen((char *)wifi_config.ap.password) == 0)
     {
         wifi_config.ap.authmode = WIFI_AUTH_OPEN;
     }
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
+    if(strlen((char *)wifi_config.ap.ssid) != 0 )
+    {
+        wifinetworkstate.ap_is_enable=true;
+        ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
+    }
 
 }
 #endif // CONFIG_WIFI_NETWORK_STA
@@ -216,6 +223,9 @@ static void wifinetwork_ap_init()
 void wifinetwork_init()
 {
 #if CONFIG_WIFI_NETWORK == 1
+
+    wifinetworkstate.station_is_enable=false;
+    wifinetworkstate.ap_is_enable=false;
 
 #ifndef CONFIG_WIFI_NETWORK_STA
     esp_netif_create_default_wifi_ap();
