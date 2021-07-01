@@ -11,6 +11,7 @@ APPCONFIG 用于定义一些通用的宏定义
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/timers.h"
+#include "freertos/semphr.h"
 
 //定义默认全局json配置文件
 #define DEFAULT_GOLBAL_CONFIG_JSON "{}"

@@ -66,6 +66,7 @@ static void init_spiffs()
 
 //全局配置文件json
 static cJSON * golbalconfig=NULL;
+static SemaphoreHandle_t golbalconfig_mutex=NULL;
 
 void init_json()
 {
@@ -111,6 +112,13 @@ void init_json()
     {
         golbalconfig=cJSON_Parse(DEFAULT_GOLBAL_CONFIG_JSON);
     }
+
+    {
+        //创建锁
+        golbalconfig_mutex=xSemaphoreCreateMutex();
+
+        xSemaphoreGive(golbalconfig_mutex);
+    }
 }
 //初始化
 void system_init()
@@ -144,11 +152,13 @@ void system_config_save()
     if(fp!=NULL)
     {
 
-        vTaskSuspendAll();
+
+        xSemaphoreTake(golbalconfig_mutex, portMAX_DELAY);
 
         char * buff=cJSON_Print(golbalconfig);
 
-        xTaskResumeAll();
+
+        xSemaphoreGive(golbalconfig_mutex);
 
         fwrite(buff,strlen(buff),1,fp);
 
@@ -175,7 +185,8 @@ void system_config_put_item(cJSON *item,const char * name)
         return;
     }
 
-    vTaskSuspendAll();
+
+    xSemaphoreTake(golbalconfig_mutex, portMAX_DELAY);
 
     if(cJSON_HasObjectItem(golbalconfig,name))
     {
@@ -184,9 +195,9 @@ void system_config_put_item(cJSON *item,const char * name)
 
     cJSON *obj=cJSON_Duplicate(item,1);
 
-    cJSON_AddObjectToObject(obj,name);
+    cJSON_AddItemToObject(golbalconfig,name,obj);
 
-    xTaskResumeAll();
+    xSemaphoreGive(golbalconfig_mutex);
 }
 
 cJSON * system_config_get_item(const char *name)
@@ -202,17 +213,18 @@ cJSON * system_config_get_item(const char *name)
         return NULL;
     }
 
-    vTaskSuspendAll();
+
+    xSemaphoreTake(golbalconfig_mutex, portMAX_DELAY);
+
+    cJSON *ret=NULL;
 
     if(cJSON_HasObjectItem(golbalconfig,name))
     {
-        return cJSON_Duplicate(cJSON_GetObjectItem(golbalconfig,name),1);
-    }
-    else
-    {
-        return NULL;
+        ret= cJSON_Duplicate(cJSON_GetObjectItem(golbalconfig,name),1);
     }
 
-    xTaskResumeAll();
+    xSemaphoreGive(golbalconfig_mutex);
+
+    return ret;
 
 }
