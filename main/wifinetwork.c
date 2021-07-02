@@ -15,7 +15,7 @@
 
 static const char *TAG = "wifi network";
 
-static volatile wifinetwork_state_t wifinetworkstate={0};
+static volatile wifinetwork_state_t wifinetworkstate= {0};
 
 #ifndef CONFIG_WIFI_NETWORK_SOFTAP
 
@@ -30,6 +30,7 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,int32_
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
     {
         wifinetworkstate.station_is_connect_ap=false;
+#ifdef CONFIG_WIFI_NETWORK_SMARTCONFIG
         if (wifinetworkstate.station_retry_num < 20)
         {
             esp_wifi_connect();
@@ -42,6 +43,11 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,int32_
 
         }
         ESP_LOGI(TAG,"connect to the AP fail");
+#else
+        esp_wifi_connect();
+        wifinetworkstate.station_retry_num++;
+        ESP_LOGI(TAG, "retry to connect to the AP");
+#endif // CONFIG_WIFI_NETWORK_SMARTCONFIG
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
@@ -52,6 +58,29 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,int32_
     }
 }
 
+static esp_event_handler_instance_t  wifinetwork_sta_event_wifi_handler=NULL;
+static esp_event_handler_instance_t  wifinetwork_sta_event_ip_handler=NULL;
+
+static void wifinetwork_sta_deinit()
+{
+    if(wifinetwork_sta_event_wifi_handler!=NULL)
+    {
+
+        ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT,
+                        ESP_EVENT_ANY_ID,
+                        wifinetwork_sta_event_wifi_handler));
+        wifinetwork_sta_event_wifi_handler=NULL;
+    }
+    if(wifinetwork_sta_event_ip_handler!=NULL)
+    {
+
+        ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT,
+                        IP_EVENT_STA_GOT_IP,
+                        wifinetwork_sta_event_ip_handler));
+        wifinetwork_sta_event_ip_handler=NULL;
+    }
+}
+
 static void wifinetwork_sta_init()
 {
 
@@ -59,12 +88,12 @@ static void wifinetwork_sta_init()
                     ESP_EVENT_ANY_ID,
                     &wifi_sta_event_handler,
                     NULL,
-                    NULL));
+                    &wifinetwork_sta_event_wifi_handler));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT,
                     IP_EVENT_STA_GOT_IP,
                     &wifi_sta_event_handler,
                     NULL,
-                    NULL));
+                    &wifinetwork_sta_event_ip_handler));
     wifi_config_t wifi_config =
     {
         .sta = {
@@ -82,7 +111,8 @@ static void wifinetwork_sta_init()
         },
     };
 
-    {//加载文件配置
+    {
+        //加载文件配置
         cJSON *obj=system_config_get_item("wifinetwork");
         if(obj==NULL)
         {
@@ -148,7 +178,19 @@ static void wifi_ap_event_handler(void* arg, esp_event_base_t event_base,
     }
 }
 
+static esp_event_handler_instance_t  wifinetwork_ap_event_wifi_handler=NULL;
 
+static void wifinetwork_ap_deinit()
+{
+    if(wifinetwork_ap_event_wifi_handler!=NULL)
+    {
+
+        ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT,
+                        ESP_EVENT_ANY_ID,
+                        wifinetwork_ap_event_wifi_handler));
+        wifinetwork_ap_event_wifi_handler=NULL;
+    }
+}
 
 static void wifinetwork_ap_init()
 {
@@ -157,7 +199,7 @@ static void wifinetwork_ap_init()
                     ESP_EVENT_ANY_ID,
                     &wifi_ap_event_handler,
                     NULL,
-                    NULL));
+                    &wifinetwork_ap_event_wifi_handler));
     wifi_config_t wifi_config =
     {
         .ap = {
@@ -170,7 +212,8 @@ static void wifinetwork_ap_init()
         },
     };
 
-     {//加载文件配置
+    {
+        //加载文件配置
         cJSON *obj=system_config_get_item("wifinetwork");
         if(obj==NULL)
         {
@@ -222,8 +265,9 @@ static void wifinetwork_ap_init()
 //初始化wifinetwork
 void wifinetwork_init()
 {
-#if CONFIG_WIFI_NETWORK == 1
+    wifinetworkstate.wifinetwork_running=false;
 
+#if CONFIG_WIFI_NETWORK == 1
 
 
 
@@ -258,6 +302,8 @@ void wifinetwork_init()
     //启动WIFI
     ESP_ERROR_CHECK(esp_wifi_start());
 
+    wifinetworkstate.wifinetwork_running=true;
+
 #endif // CONFIG_WIFI_NETWORK
 }
 
@@ -276,7 +322,8 @@ void wifinetwork_station_set_config(const char * ssid,const char * password)
         obj=cJSON_CreateObject();
     }
 
-    {//删除原有相关项
+    {
+        //删除原有相关项
         if(cJSON_HasObjectItem(obj,"station_ssid"))
         {
             cJSON_DeleteItemFromObject(obj,"station_ssid");
@@ -287,7 +334,8 @@ void wifinetwork_station_set_config(const char * ssid,const char * password)
         }
     }
 
-    {//写入新数据
+    {
+        //写入新数据
         if(ssid==NULL)
         {
             cJSON *tempobj=cJSON_CreateString(CONFIG_WIFI_NETWORK_ROUTER_AP_SSID);
@@ -329,7 +377,8 @@ void wifinetwork_ap_set_config(const char * ssid,const char * password)
         obj=cJSON_CreateObject();
     }
 
-    {//删除原有相关项
+    {
+        //删除原有相关项
         if(cJSON_HasObjectItem(obj,"ap_ssid"))
         {
             cJSON_DeleteItemFromObject(obj,"ap_ssid");
@@ -340,7 +389,8 @@ void wifinetwork_ap_set_config(const char * ssid,const char * password)
         }
     }
 
-    {//写入新数据
+    {
+        //写入新数据
         if(ssid==NULL)
         {
             cJSON *tempobj=cJSON_CreateString(CONFIG_WIFI_NETWORK_AP_SSID);
@@ -371,3 +421,53 @@ void wifinetwork_ap_set_config(const char * ssid,const char * password)
     cJSON_Delete(obj);
 }
 #endif // CONFIG_WIFI_NETWORK_STA
+
+//停止wifinetowrk
+void wifinetwork_stop()
+{
+#if CONFIG_WIFI_NETWORK == 1
+#ifdef CONFIG_WIFI_NETWORK_STA
+    wifinetwork_sta_deinit();
+#endif // CONFIG_WIFI_NETWORK_STA
+
+#ifdef CONFIG_WIFI_NETWORK_SOFTAP
+    wifinetwork_ap_deinit();
+#endif // CONFIG_WIFI_NETWORK_SOFTAP
+
+#ifdef CONFIG_WIFI_NETWORK_SOFTAPSTA
+    wifinetwork_ap_deinit();
+    wifinetwork_sta_deinit();
+#endif // CONFIG_WIFI_NETWORK_SOFTAPSTA
+
+    //启动WIFI
+    ESP_ERROR_CHECK(esp_wifi_stop());
+#endif // CONFIG_WIFI_NETWORK
+
+    wifinetworkstate.wifinetwork_running=false;
+}
+
+//启动wifinetowrk
+void wifinetwork_start()
+{
+#if CONFIG_WIFI_NETWORK == 1
+#ifdef CONFIG_WIFI_NETWORK_STA
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+    wifinetwork_sta_init();
+#endif // CONFIG_WIFI_NETWORK_STA
+
+#ifdef CONFIG_WIFI_NETWORK_SOFTAP
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+    wifinetwork_ap_init();
+#endif // CONFIG_WIFI_NETWORK_SOFTAP
+
+#ifdef CONFIG_WIFI_NETWORK_SOFTAPSTA
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
+    wifinetwork_ap_init();
+    wifinetwork_sta_init();
+#endif // CONFIG_WIFI_NETWORK_SOFTAPSTA
+
+    //启动WIFI
+    ESP_ERROR_CHECK(esp_wifi_start());
+#endif // CONFIG_WIFI_NETWORK
+    wifinetworkstate.wifinetwork_running=true;
+}

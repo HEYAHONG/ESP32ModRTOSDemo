@@ -22,12 +22,18 @@ typedef struct
     bool ap_is_enable;
     int ap_station_count;
 #endif // CONFIG_WIFI_NETWORK_STA
-
+    bool wifinetwork_running;
 } wifinetwork_state_t;
 
 //≥ı ºªØwifinetwork
 void wifinetwork_init();
 
+
+//Õ£÷πwifinetowrk
+void wifinetwork_stop();
+
+//∆Ù∂Øwifinetowrk
+void wifinetwork_start();
 
 wifinetwork_state_t wifinetwork_getstate();
 
