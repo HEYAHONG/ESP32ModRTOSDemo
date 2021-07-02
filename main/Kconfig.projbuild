@@ -80,6 +80,18 @@ config ESP_SMARTCONFIG_TYPE
 	default 2 if ESP_TOUCH-AIRKISS
 	default 3 if ESP_TOUCH_V2
 
+config WIFI_NETWORK_RETRY_COUNT
+	int "WIFI network sta retry count"
+	range 1 1000000
+	default 10
+
+config WIFI_NETWORK_SMARTCONFIG_TIMEOUT
+	int "WIFI network smartconfig timeout"
+	range 1 1000000
+	default 300
+
+
+
 endif
 
 endif

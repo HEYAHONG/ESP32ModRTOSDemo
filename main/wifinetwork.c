@@ -12,6 +12,7 @@
 #include "sdkconfig.h"
 #include "stdbool.h"
 #include "init.h"
+#include "esp_smartconfig.h"
 
 static const char *TAG = "wifi network";
 
@@ -31,7 +32,7 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,int32_
     {
         wifinetworkstate.station_is_connect_ap=false;
 #ifdef CONFIG_WIFI_NETWORK_SMARTCONFIG
-        if (wifinetworkstate.station_retry_num < 20)
+        if (wifinetworkstate.station_retry_num < CONFIG_WIFI_NETWORK_RETRY_COUNT)
         {
             esp_wifi_connect();
             wifinetworkstate.station_retry_num++;
@@ -40,6 +41,17 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,int32_
         else
         {
             //WIFIÁ¬½ÓÊ§°Ü
+            if(wifinetworkstate.station_is_connect_ap_ever)
+            {
+                esp_wifi_connect();
+                wifinetworkstate.station_retry_num++;
+                ESP_LOGI(TAG, "retry to connect to the AP");
+            }
+            else
+            {
+                wifinetworkstate.station_retry_num=0;
+                wifinetwork_sta_smartconfg_start(CONFIG_ESP_SMARTCONFIG_TYPE,CONFIG_WIFI_NETWORK_SMARTCONFIG_TIMEOUT);
+            }
 
         }
         ESP_LOGI(TAG,"connect to the AP fail");
@@ -55,6 +67,7 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,int32_
         ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         wifinetworkstate.station_retry_num = 0;
         wifinetworkstate.station_is_connect_ap=true;
+        wifinetworkstate.station_is_connect_ap_ever=true;
     }
 }
 
@@ -278,6 +291,8 @@ void wifinetwork_init()
 #ifndef CONFIG_WIFI_NETWORK_SOFTAP
     esp_netif_create_default_wifi_sta();
     wifinetworkstate.station_is_enable=false;
+    wifinetworkstate.station_is_in_smartconfig=false;
+    wifinetworkstate.station_is_connect_ap_ever=false;
 #endif // CONFIG_WIFI_NETWORK_SOFTAP
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -471,3 +486,185 @@ void wifinetwork_start()
 #endif // CONFIG_WIFI_NETWORK
     wifinetworkstate.wifinetwork_running=true;
 }
+
+#ifndef CONFIG_WIFI_NETWORK_SOFTAP
+
+static EventGroupHandle_t wifinetwork_smartconfig_event_group=NULL;
+/* The event group allows multiple bits for each event,
+   but we only care about one event - are we connected
+   to the AP with an IP? */
+static const int CONNECTED_BIT = BIT0;
+static const int ESPTOUCH_DONE_BIT = BIT1;
+
+static TickType_t wifinetwork_smartconfig_stoptick=0;
+
+static void smartconfig_check_task(void * parm)
+{
+    EventBits_t uxBits;
+    smartconfig_start_config_t cfg = SMARTCONFIG_START_CONFIG_DEFAULT();
+    ESP_ERROR_CHECK( esp_smartconfig_start(&cfg) );
+    while (1) {
+        uxBits = xEventGroupWaitBits(wifinetwork_smartconfig_event_group, CONNECTED_BIT | ESPTOUCH_DONE_BIT, true, false, pdMS_TO_TICKS(100));
+        if(uxBits & CONNECTED_BIT) {
+            ESP_LOGI(TAG, "WiFi Connected to ap");
+        }
+        if(uxBits & ESPTOUCH_DONE_BIT) {
+            ESP_LOGI(TAG, "smartconfig over");
+            esp_smartconfig_stop();
+
+            //Í£Ö¹smartconfig
+            wifinetwork_sta_smartconfg_stop();
+
+
+            vTaskDelete(NULL);
+        }
+
+        TickType_t current_tick=xTaskGetTickCount();
+        if((wifinetwork_smartconfig_stoptick-current_tick)>0 && (wifinetwork_smartconfig_stoptick-current_tick) <1000)
+        {
+            ESP_LOGI(TAG, "smartconfig timeout");
+            esp_smartconfig_stop();
+
+            //Í£Ö¹smartconfig
+            wifinetwork_sta_smartconfg_stop();
+
+
+            vTaskDelete(NULL);
+        }
+    }
+}
+
+static TaskHandle_t wifinetwork_smartconfig_check_task_handle=NULL;
+
+static void wifinetwork_smartconfig_event_handler(void* arg, esp_event_base_t event_base,
+                                int32_t event_id, void* event_data)
+{
+    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
+       xTaskCreate(smartconfig_check_task, "smartconfig_check_task", 4096, NULL, 3, &wifinetwork_smartconfig_check_task_handle);
+    } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
+        esp_wifi_connect();
+        xEventGroupClearBits( wifinetwork_smartconfig_event_group, CONNECTED_BIT);
+    } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
+        xEventGroupSetBits( wifinetwork_smartconfig_event_group, CONNECTED_BIT);
+    } else if (event_base == SC_EVENT && event_id == SC_EVENT_SCAN_DONE) {
+        ESP_LOGI(TAG, "Scan done");
+    } else if (event_base == SC_EVENT && event_id == SC_EVENT_FOUND_CHANNEL) {
+        ESP_LOGI(TAG, "Found channel");
+    } else if (event_base == SC_EVENT && event_id == SC_EVENT_GOT_SSID_PSWD) {
+        ESP_LOGI(TAG, "Got SSID and password");
+
+        smartconfig_event_got_ssid_pswd_t *evt = (smartconfig_event_got_ssid_pswd_t *)event_data;
+        wifi_config_t wifi_config;
+        uint8_t ssid[33] = { 0 };
+        uint8_t password[65] = { 0 };
+        uint8_t rvd_data[33] = { 0 };
+
+        bzero(&wifi_config, sizeof(wifi_config_t));
+        memcpy(wifi_config.sta.ssid, evt->ssid, sizeof(wifi_config.sta.ssid));
+        memcpy(wifi_config.sta.password, evt->password, sizeof(wifi_config.sta.password));
+        wifi_config.sta.bssid_set = evt->bssid_set;
+        if (wifi_config.sta.bssid_set == true) {
+            memcpy(wifi_config.sta.bssid, evt->bssid, sizeof(wifi_config.sta.bssid));
+        }
+
+        memcpy(ssid, evt->ssid, sizeof(evt->ssid));
+        memcpy(password, evt->password, sizeof(evt->password));
+        ESP_LOGI(TAG, "SSID:%s", ssid);
+        ESP_LOGI(TAG, "PASSWORD:%s", password);
+        if (evt->type == SC_TYPE_ESPTOUCH_V2) {
+            ESP_ERROR_CHECK( esp_smartconfig_get_rvd_data(rvd_data, sizeof(rvd_data)) );
+            ESP_LOGI(TAG, "RVD_DATA:");
+            for (int i=0; i<33; i++) {
+                printf("%02x ", rvd_data[i]);
+            }
+            printf("\n");
+        }
+
+        ESP_ERROR_CHECK( esp_wifi_disconnect() );
+
+
+        //±£´æÃÜÂë
+        wifinetwork_station_set_config((char *)ssid,(char *)password);
+
+
+
+        ESP_ERROR_CHECK( esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
+        esp_wifi_connect();
+    } else if (event_base == SC_EVENT && event_id == SC_EVENT_SEND_ACK_DONE) {
+        xEventGroupSetBits(wifinetwork_smartconfig_event_group, ESPTOUCH_DONE_BIT);
+    }
+}
+
+
+static esp_event_handler_instance_t  wifinetwork_sta_smartconfig_event_wifi_handler=NULL;
+static esp_event_handler_instance_t  wifinetwork_sta_smartconfig_event_ip_handler=NULL;
+static esp_event_handler_instance_t  wifinetwork_sta_smartconfig_event_sc_handler=NULL;
+
+//Æô¶¯smartconfig
+void wifinetwork_sta_smartconfg_start(smartconfig_type_t sctype,size_t timeout_s)
+{
+    if(wifinetworkstate.station_is_in_smartconfig==true)
+    {
+        return;
+    }
+
+    wifinetwork_smartconfig_stoptick=xTaskGetTickCount()+timeout_s*1000*pdMS_TO_TICKS(timeout_s);
+
+    wifinetwork_stop();
+
+    if(wifinetwork_smartconfig_event_group==NULL)
+    {
+        wifinetwork_smartconfig_event_group = xEventGroupCreate();
+    }
+
+    xEventGroupClearBits(wifinetwork_smartconfig_event_group, CONNECTED_BIT | ESPTOUCH_DONE_BIT);
+
+    ESP_ERROR_CHECK( esp_event_handler_instance_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifinetwork_smartconfig_event_handler, NULL,&wifinetwork_sta_smartconfig_event_wifi_handler) );
+    ESP_ERROR_CHECK( esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &wifinetwork_smartconfig_event_handler, NULL,&wifinetwork_sta_smartconfig_event_ip_handler) );
+    ESP_ERROR_CHECK( esp_event_handler_instance_register(SC_EVENT, ESP_EVENT_ANY_ID, &wifinetwork_smartconfig_event_handler, NULL, &wifinetwork_sta_smartconfig_event_sc_handler));
+
+    ESP_ERROR_CHECK( esp_smartconfig_set_type(sctype) );
+
+    ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_STA) );
+    ESP_ERROR_CHECK( esp_wifi_start() );
+
+}
+
+//Í£Ö¹smartconfig
+void wifinetwork_sta_smartconfg_stop()
+{
+
+    if(wifinetworkstate.station_is_in_smartconfig==true)
+    {
+        vTaskDelete(wifinetwork_smartconfig_check_task_handle);
+    }
+
+    if(wifinetwork_sta_smartconfig_event_wifi_handler !=NULL)
+    {
+        ESP_ERROR_CHECK( esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, wifinetwork_sta_smartconfig_event_wifi_handler) );
+        wifinetwork_sta_smartconfig_event_wifi_handler=NULL;
+    }
+    if(wifinetwork_sta_smartconfig_event_ip_handler!=NULL)
+    {
+        ESP_ERROR_CHECK( esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, wifinetwork_sta_smartconfig_event_ip_handler) );
+        wifinetwork_sta_smartconfig_event_ip_handler=NULL;
+    }
+    if(wifinetwork_sta_smartconfig_event_sc_handler!=NULL)
+    {
+        ESP_ERROR_CHECK( esp_event_handler_instance_unregister(SC_EVENT, ESP_EVENT_ANY_ID,wifinetwork_sta_smartconfig_event_sc_handler ));
+        wifinetwork_sta_smartconfig_event_sc_handler=NULL;
+    }
+
+    //Í£Ö¹WIFIÍøÂç
+    wifinetwork_stop();
+
+    wifinetwork_smartconfig_stoptick=0;
+    wifinetworkstate.station_is_in_smartconfig=false;
+
+    //Æô¶¯wifiÍøÂç
+    wifinetwork_start();
+
+}
+
+
+#endif // CONFIG_WIFI_NETWORK_SOFTAP

@@ -7,6 +7,8 @@ extern "C"
 #endif // __cplusplus
 
 #include "appconfig.h"
+#include "esp_smartconfig.h"
+#include "stdint.h"
 
 typedef struct
 {
@@ -15,6 +17,8 @@ typedef struct
     bool station_is_enable;
     int station_retry_num;
     bool station_is_connect_ap;
+    bool station_is_connect_ap_ever;//曾连接过
+    bool station_is_in_smartconfig;
 #endif // CONFIG_WIFI_NETWORK_SOFTAP
 
 #ifndef CONFIG_WIFI_NETWORK_STA
@@ -40,12 +44,22 @@ wifinetwork_state_t wifinetwork_getstate();
 #ifndef CONFIG_WIFI_NETWORK_SOFTAP
 //设置STA相关参数
 void wifinetwork_station_set_config(const char * ssid,const char * password);
+
+//启动smartconfig
+void wifinetwork_sta_smartconfg_start(smartconfig_type_t sctype,size_t timeout_s);
+
+//停止smartconfig
+void wifinetwork_sta_smartconfg_stop();
+
 #endif // CONFIG_WIFI_NETWORK_SOFTAP
 
 #ifndef CONFIG_WIFI_NETWORK_STA
 //设置AP相关参数
 void wifinetwork_ap_set_config(const char * ssid,const char * password);
+
 #endif // CONFIG_WIFI_NETWORK_STA
+
+
 
 
 #ifdef __cplusplus
