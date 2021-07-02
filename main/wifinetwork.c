@@ -224,14 +224,16 @@ void wifinetwork_init()
 {
 #if CONFIG_WIFI_NETWORK == 1
 
-    wifinetworkstate.station_is_enable=false;
-    wifinetworkstate.ap_is_enable=false;
+
+
 
 #ifndef CONFIG_WIFI_NETWORK_STA
     esp_netif_create_default_wifi_ap();
+    wifinetworkstate.ap_is_enable=false;
 #endif // CONFIG_WIFI_NETWORK_STA
 #ifndef CONFIG_WIFI_NETWORK_SOFTAP
     esp_netif_create_default_wifi_sta();
+    wifinetworkstate.station_is_enable=false;
 #endif // CONFIG_WIFI_NETWORK_SOFTAP
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
