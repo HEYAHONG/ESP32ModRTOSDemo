@@ -439,7 +439,7 @@ void wifinetwork_stop()
     wifinetwork_sta_deinit();
 #endif // CONFIG_WIFI_NETWORK_SOFTAPSTA
 
-    //Æô¶¯WIFI
+    //Í£Ö¹WIFI
     ESP_ERROR_CHECK(esp_wifi_stop());
 #endif // CONFIG_WIFI_NETWORK
 
