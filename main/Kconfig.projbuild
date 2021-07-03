@@ -35,7 +35,21 @@ config WIFI_NETWORK_AP_SSID
 config WIFI_NETWORK_AP_PASSWORD
 	string "WIFI AP password(default)"
 	default "12345678"
-	 depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_SOFTAP
+	depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_SOFTAP
+
+config WIFI_NETWORK_AP_CHANNEL
+	int "WIFI AP channel"
+	range 0 14
+	default 7
+	depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_SOFTAP
+
+config WIFI_NETWORK_AP_MAX_CONNETION 
+        int "WIFI AP max connection"
+        range 0 20
+        default 4
+        depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_SOFTAP
+
+
 
 config WIFI_NETWORK_ROUTER_AP_SSID
 	string "WIFI Router ssid(default)"
