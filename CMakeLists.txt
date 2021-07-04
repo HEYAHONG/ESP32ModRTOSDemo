@@ -2,5 +2,9 @@
 # in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.5)
 
+set(ENV{PROJECT_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
+
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(ESP32Mod)
+

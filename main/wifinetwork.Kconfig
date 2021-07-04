@@ -1,0 +1,95 @@
+
+
+choice WIFI_NETWORK_TYPE
+        bool "WIFI network type"
+        default WIFI_NETWORK_SOFTAPSTA
+config  WIFI_NETWORK_STA
+        bool "STA"
+config  WIFI_NETWORK_SOFTAP
+        bool "SoftAP"
+
+config  WIFI_NETWORK_SOFTAPSTA
+        bool "SoftAP + STA"
+
+endchoice                                                                                                                                                                                    
+                                                                                                                                                                                             
+config WIFI_NETWORK_AP_SSID                                                                                                                                                                  
+        string "WIFI AP ssid(default)"                                                                                                                                                       
+        default "Test"                                                                                                                                                                       
+        depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_SOFTAP                                                                                                                            
+                                                                                                                                                                                             
+config WIFI_NETWORK_AP_PASSWORD
+        string "WIFI AP password(default)"
+        default "12345678"
+        depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_SOFTAP
+
+config WIFI_NETWORK_AP_CHANNEL
+        int "WIFI AP channel"
+        range 0 14
+        default 7
+        depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_SOFTAP
+
+config WIFI_NETWORK_AP_MAX_CONNETION 
+        int "WIFI AP max connection"
+        range 0 20
+        default 4
+        depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_SOFTAP
+
+
+
+config WIFI_NETWORK_ROUTER_AP_SSID
+        string "WIFI Router ssid(default)"
+        default "TestRouter"
+         depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_STA
+
+config  WIFI_NETWORK_ROUTER_AP_PASSWORD
+        string "WIFI Router password(default)"
+        default "12345678"
+        depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_STA
+
+
+menuconfig WIFI_NETWORK_SMARTCONFIG
+        bool "Enable SmartConfig if WIFI_STA failed"
+        default y
+        depends on  WIFI_NETWORK_STA
+
+if  WIFI_NETWORK_SMARTCONFIG
+
+choice ESP_SMARTCONFIG_TYPE
+        prompt "Smartconfig Type"
+        default ESP_TOUCH
+        help
+                Set protocol type of SmartConfig.
+
+                Start SmartConfig method according to the selected type when user select "ESPTouch", "AirKiss",  "ESPTouch and AirKiss" or "ESPTouch V2" type.
+
+config ESP_TOUCH
+        bool "ESPTouch"
+config AIRKISS
+        bool "AirKiss"
+config ESP_TOUCH-AIRKISS
+        bool "ESPTouch and AirKiss"
+config ESP_TOUCH_V2
+        bool "ESPTouch-V2"
+endchoice
+
+config ESP_SMARTCONFIG_TYPE
+        int
+        default 0 if ESP_TOUCH
+        default 1 if AIRKISS
+        default 2 if ESP_TOUCH-AIRKISS
+        default 3 if ESP_TOUCH_V2
+
+config WIFI_NETWORK_RETRY_COUNT
+        int "WIFI network sta retry count"
+        range 1 1000000
+        default 10
+
+config WIFI_NETWORK_SMARTCONFIG_TIMEOUT
+        int "WIFI network smartconfig timeout"
+        range 1 1000000
+        default 300
+
+
+
+endif
