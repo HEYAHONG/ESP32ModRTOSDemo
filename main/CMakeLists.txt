@@ -1,5 +1,5 @@
-set(COMPONENT_SRCS "main.c"  "tftpd.c" "init.c" "wifinetwork.c")
-set(COMPONENT_ADD_INCLUDEDIRS "." )
+set(COMPONENT_SRCS "main.c"  "tftpd.c" "init.c" "wifinetwork.c" "mesh_netif/mesh_netif.c")
+set(COMPONENT_ADD_INCLUDEDIRS "." "mesh_netif" )
 
 #默认框架中为启用tftp,在此处启用
 set(COMPONENT_SRCS ${COMPONENT_SRCS} tftp/tftp_server.c)
