@@ -29,7 +29,7 @@ config WIFI_NETWORK_AP_CHANNEL
         default 7
         depends on WIFI_NETWORK_SOFTAPSTA ||  WIFI_NETWORK_SOFTAP
 
-config WIFI_NETWORK_AP_MAX_CONNETION 
+config WIFI_NETWORK_AP_MAX_CONNECTION 
         int "WIFI AP max connection"
         range 0 20
         default 4

@@ -220,9 +220,9 @@ static void wifinetwork_ap_init()
         .ap = {
             .ssid = CONFIG_WIFI_NETWORK_AP_SSID,
             .ssid_len = strlen(CONFIG_WIFI_NETWORK_AP_SSID),
-            .channel = 7,
+            .channel = CONFIG_WIFI_NETWORK_AP_CHANNEL,
             .password = CONFIG_WIFI_NETWORK_AP_PASSWORD,
-            .max_connection = 10,
+            .max_connection = CONFIG_WIFI_NETWORK_AP_MAX_CONNECTION,
             .authmode = WIFI_AUTH_WPA_WPA2_PSK
         },
     };
