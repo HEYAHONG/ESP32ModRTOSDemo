@@ -18,4 +18,14 @@ source "$(PROJECT_PATH)/main/wifinetwork.Kconfig"
 
 endif
 
+menuconfig WIFI_MESH_NETWORK
+	bool "Enable WIFI mesh network"
+	default y
+	depends on !WIFI_NETWORK
+
+if WIFI_MESH_NETWORK
+
+source "$(PROJECT_PATH)/main/wifimeshnet.Kconfig"
+
+endif
 endmenu

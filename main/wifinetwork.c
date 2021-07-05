@@ -18,6 +18,8 @@ static const char *TAG = "wifi network";
 
 static volatile wifinetwork_state_t wifinetworkstate= {0};
 
+
+#if CONFIG_WIFI_NETWORK == 1
 #ifndef CONFIG_WIFI_NETWORK_SOFTAP
 
 
@@ -218,9 +220,9 @@ static void wifinetwork_ap_init()
         .ap = {
             .ssid = CONFIG_WIFI_NETWORK_AP_SSID,
             .ssid_len = strlen(CONFIG_WIFI_NETWORK_AP_SSID),
-            .channel = CONFIG_WIFI_NETWORK_AP_CHANNEL,
+            .channel = 7,
             .password = CONFIG_WIFI_NETWORK_AP_PASSWORD,
-            .max_connection = CONFIG_WIFI_NETWORK_AP_MAX_CONNETION,
+            .max_connection = 10,
             .authmode = WIFI_AUTH_WPA_WPA2_PSK
         },
     };
@@ -275,6 +277,9 @@ static void wifinetwork_ap_init()
 
 }
 #endif // CONFIG_WIFI_NETWORK_STA
+
+#endif // CONFIG_WIFI_NETWORK
+
 //初始化wifinetwork
 void wifinetwork_init()
 {
@@ -331,6 +336,7 @@ wifinetwork_state_t wifinetwork_getstate()
 //设置STA相关参数
 void wifinetwork_station_set_config(const char * ssid,const char * password)
 {
+#if CONFIG_WIFI_NETWORK == 1
     cJSON *obj=system_config_get_item("wifinetwork");
     if(obj==NULL)
     {
@@ -379,6 +385,7 @@ void wifinetwork_station_set_config(const char * ssid,const char * password)
     system_config_save();
 
     cJSON_Delete(obj);
+#endif // CONFIG_WIFI_NETWORK
 }
 #endif // CONFIG_WIFI_NETWORK_SOFTAP
 
@@ -386,6 +393,7 @@ void wifinetwork_station_set_config(const char * ssid,const char * password)
 //设置AP相关参数
 void wifinetwork_ap_set_config(const char * ssid,const char * password)
 {
+#if CONFIG_WIFI_NETWORK == 1
     cJSON *obj=system_config_get_item("wifinetwork");
     if(obj==NULL)
     {
@@ -434,6 +442,7 @@ void wifinetwork_ap_set_config(const char * ssid,const char * password)
     system_config_save();
 
     cJSON_Delete(obj);
+#endif // CONFIG_WIFI_NETWORK
 }
 #endif // CONFIG_WIFI_NETWORK_STA
 
@@ -487,7 +496,11 @@ void wifinetwork_start()
     wifinetworkstate.wifinetwork_running=true;
 }
 
+
+
 #ifndef CONFIG_WIFI_NETWORK_SOFTAP
+
+#if CONFIG_WIFI_NETWORK == 1
 
 static EventGroupHandle_t wifinetwork_smartconfig_event_group=NULL;
 /* The event group allows multiple bits for each event,
@@ -600,9 +613,14 @@ static esp_event_handler_instance_t  wifinetwork_sta_smartconfig_event_wifi_hand
 static esp_event_handler_instance_t  wifinetwork_sta_smartconfig_event_ip_handler=NULL;
 static esp_event_handler_instance_t  wifinetwork_sta_smartconfig_event_sc_handler=NULL;
 
+#endif // CONFIG_WIFI_NETWORK
+
 //启动smartconfig
 void wifinetwork_sta_smartconfg_start(smartconfig_type_t sctype,size_t timeout_s)
 {
+
+#if CONFIG_WIFI_NETWORK == 1
+
     if(wifinetworkstate.station_is_in_smartconfig==true)
     {
         return;
@@ -627,13 +645,13 @@ void wifinetwork_sta_smartconfg_start(smartconfig_type_t sctype,size_t timeout_s
 
     ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_STA) );
     ESP_ERROR_CHECK( esp_wifi_start() );
-
+#endif // CONFIG_WIFI_NETWORK
 }
 
 //停止smartconfig
 void wifinetwork_sta_smartconfg_stop()
 {
-
+#if CONFIG_WIFI_NETWORK == 1
     if(wifinetworkstate.station_is_in_smartconfig==true)
     {
         vTaskDelete(wifinetwork_smartconfig_check_task_handle);
@@ -663,7 +681,7 @@ void wifinetwork_sta_smartconfg_stop()
 
     //启动wifi网络
     wifinetwork_start();
-
+#endif // CONFIG_WIFI_NETWORK
 }
 
 
