@@ -14,12 +14,15 @@
 #include "init.h"
 #include "esp_smartconfig.h"
 
-static const char *TAG = "wifi network";
+
 
 static volatile wifinetwork_state_t wifinetworkstate= {0};
 
 
 #if CONFIG_WIFI_NETWORK == 1
+
+static const char *TAG = "wifi network";
+
 #ifndef CONFIG_WIFI_NETWORK_SOFTAP
 
 
