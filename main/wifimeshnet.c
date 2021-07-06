@@ -15,12 +15,7 @@
 
 
 
-// commands for internal mesh communication:
-// <CMD> <PAYLOAD>, where CMD is one character, payload is variable dep. on command
-#define CMD_KEYPRESSED 0x55
-// CMD_KEYPRESSED: payload is always 6 bytes identifying address of node sending keypress event
-#define CMD_ROUTE_TABLE 0x56
-// CMD_KEYPRESSED: payload is a multiple of 6 listing addresses in a routing table
+
 /*******************************************************
  *                Constants
  *******************************************************/
