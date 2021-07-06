@@ -32,41 +32,14 @@ static const char MESH_ID[7] =CONFIG_MESH_ID;
 /*******************************************************
  *                Variable Definitions
  *******************************************************/
-//static bool is_running = true;
 static mesh_addr_t mesh_parent_addr;
 static int mesh_layer = -1;
 static esp_ip4_addr_t s_current_ip;
-static mesh_addr_t s_route_table[CONFIG_MESH_ROUTE_TABLE_SIZE];
-static int s_route_table_size = 0;
-static SemaphoreHandle_t s_route_table_lock = NULL;
-//static uint8_t s_mesh_tx_payload[CONFIG_MESH_ROUTE_TABLE_SIZE*6+1];
+
 
 static void  recv_cb(mesh_addr_t *from, mesh_data_t *data)
 {
-    if (data->data[0] == CMD_ROUTE_TABLE) {
-        int size =  data->size - 1;
-        if (s_route_table_lock == NULL || size%6 != 0) {
-            ESP_LOGE(MESH_TAG, "Error in receiving raw mesh data: Unexpected size");
-            return;
-        }
-        xSemaphoreTake(s_route_table_lock, portMAX_DELAY);
-        s_route_table_size = size / 6;
-        for (int i=0; i < s_route_table_size; ++i) {
-            ESP_LOGI(MESH_TAG, "Received Routing table [%d] "
-                    MACSTR, i, MAC2STR(data->data + 6*i + 1));
-        }
-        memcpy(&s_route_table, data->data + 1, size);
-        xSemaphoreGive(s_route_table_lock);
-    } else if (data->data[0] == CMD_KEYPRESSED) {
-        if (data->size != 7) {
-            ESP_LOGE(MESH_TAG, "Error in receiving raw mesh data: Unexpected size");
-            return;
-        }
-        ESP_LOGW(MESH_TAG, "Keypressed detected on node: "
-                MACSTR, MAC2STR(data->data + 1));
-    } else {
-        ESP_LOGE(MESH_TAG, "Error in receiving raw mesh data: Unknown command");
-    }
+    return;
 }
 
 static void mesh_event_handler(void *arg, esp_event_base_t event_base,
