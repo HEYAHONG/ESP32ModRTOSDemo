@@ -31,15 +31,26 @@ static mesh_addr_t mesh_parent_addr;
 static int mesh_layer = -1;
 static esp_ip4_addr_t s_current_ip;
 
+static wifimeshnet_callback_t wifimeshnet_callback={NULL,NULL,NULL};
 
 static void  recv_cb(mesh_addr_t *from, mesh_data_t *data)
 {
+    if(wifimeshnet_callback.receive_callback!=NULL)
+    {
+        wifimeshnet_callback.receive_callback(from,data);
+    }
+
     return;
 }
 
 static void mesh_event_handler(void *arg, esp_event_base_t event_base,
                         int32_t event_id, void *event_data)
 {
+    if(wifimeshnet_callback.mesh_event_handler!=NULL)
+    {
+      wifimeshnet_callback.mesh_event_handler(arg,event_base,event_id,event_data);
+    };
+
     mesh_addr_t id = {0,};
     static uint8_t last_layer = 0;
 
@@ -243,6 +254,12 @@ static void mesh_event_handler(void *arg, esp_event_base_t event_base,
 void ip_event_handler(void *arg, esp_event_base_t event_base,
                       int32_t event_id, void *event_data)
 {
+
+    if(wifimeshnet_callback.ip_event_handler!=NULL)
+    {
+        wifimeshnet_callback.ip_event_handler(arg,event_base,event_id,event_data);
+    }
+
     ip_event_got_ip_t *event = (ip_event_got_ip_t *) event_data;
     ESP_LOGI(MESH_TAG, "<IP_EVENT_STA_GOT_IP>IP:" IPSTR, IP2STR(&event->ip_info.ip));
     s_current_ip.addr = event->ip_info.ip.addr;
@@ -255,10 +272,12 @@ void ip_event_handler(void *arg, esp_event_base_t event_base,
 }
 
 //初始化wifimeshnet
-void wifimeshnet_init()
+void wifimeshnet_init(wifimeshnet_callback_t callback)
 {
 
-/*  crete network interfaces for mesh (only station instance saved for further manipulation, soft AP instance ignored */
+    wifimeshnet_callback=callback;
+
+    /*  crete network interfaces for mesh (only station instance saved for further manipulation, soft AP instance ignored */
     ESP_ERROR_CHECK(mesh_netifs_init(recv_cb));
 
     /*  wifi initialization */

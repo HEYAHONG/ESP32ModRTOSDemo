@@ -15,6 +15,10 @@
 
 static const char *TAG = "esp32 main";
 
+#if CONFIG_WIFI_MESH_NETWORK == 1
+wifimeshnet_callback_t meshcb={NULL,NULL,NULL};
+#endif // CONFIG_WIFI_MESH_NETWORK
+
 static void main_task ()
 {
 
@@ -25,7 +29,7 @@ static void main_task ()
 #endif // CONFIG_WIFI_NETWORK
 
 #if CONFIG_WIFI_MESH_NETWORK == 1
-    wifimeshnet_init();
+    wifimeshnet_init(meshcb);
 #endif // CONFIG_WIFI_MESH_NETWORK
 
     ESP_LOGI(TAG,"FreeMemory:%d Bytes",esp_get_minimum_free_heap_size());

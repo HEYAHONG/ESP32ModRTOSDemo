@@ -10,6 +10,7 @@ extern "C"
 #include "esp_smartconfig.h"
 #include "stdint.h"
 
+
 typedef struct
 {
 #ifndef CONFIG_WIFI_NETWORK_SOFTAP
