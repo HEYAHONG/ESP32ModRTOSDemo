@@ -135,9 +135,7 @@ void system_init()
 
     init_json();
 
-#if CONFIG_LWIP_TFTPD_ON_BOOT == 1
-    tftpd_start();
-#endif // LWIP_TFTPD_ON_BOOT
+
 
 }
 
