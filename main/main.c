@@ -12,6 +12,7 @@
 #include "wifinetwork.h"
 #include "wifimeshnet.h"
 #include "tftpd.h"
+#include "mqtt.h"
 
 
 static const char *TAG = "esp32 main";
@@ -36,6 +37,10 @@ static void main_task ()
 #if CONFIG_LWIP_TFTPD_ON_BOOT == 1
     tftpd_start();
 #endif // LWIP_TFTPD_ON_BOOT
+
+#if CONFIG_NETWORK_PROTOCAL_MQTT == 1
+    mqttc_start();
+#endif // CONFIG_NETWORK_PROTOCAL_MQTT
 
     ESP_LOGI(TAG,"FreeMemory:%d Bytes,Min FreeMemory:%d Bytes ",esp_get_free_heap_size(),esp_get_minimum_free_heap_size());
 

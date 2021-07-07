@@ -1,4 +1,4 @@
-set(COMPONENT_SRCS "main.c"  "tftpd.c" "init.c" "wifinetwork.c" "wifimeshnet.c" "mesh_netif/mesh_netif.c")
+set(COMPONENT_SRCS "main.c"  "tftpd.c" "init.c" "wifinetwork.c" "mqtt.c" "wifimeshnet.c" "mesh_netif/mesh_netif.c")
 set(COMPONENT_ADD_INCLUDEDIRS "." "mesh_netif" )
 
 #默认框架中为启用tftp,在此处启用
