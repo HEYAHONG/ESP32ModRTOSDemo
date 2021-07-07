@@ -4,9 +4,6 @@ config GOLBAL_CONFIG_FILENAME
 	string "Golbal Config FileName"
 	default "config.json"
 
-config LWIP_TFTPD_ON_BOOT
-        bool "Start TFTPD  On Boot"
-	default y
 
 menuconfig WIFI_NETWORK
 	bool "Enable WIFI network"
@@ -28,4 +25,26 @@ if WIFI_MESH_NETWORK
 source "$(PROJECT_PATH)/main/wifimeshnet.Kconfig"
 
 endif
+
+menu "Network Protocols"
+
+config LWIP_TFTPD_ON_BOOT
+        bool "Start TFTPD  On Boot"
+        default y
+	depends on WIFI_MESH_NETWORK ||  WIFI_NETWORK
+
+menuconfig NETWORK_PROTOCAL_MQTT
+	bool "MQTT Client"
+	default y
+	depends on WIFI_MESH_NETWORK ||  WIFI_NETWORK
+
+if  NETWORK_PROTOCAL_MQTT
+
+source "$(PROJECT_PATH)/main/mqtt.Kconfig"
+
+endif
+
+
+endmenu
+
 endmenu

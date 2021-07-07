@@ -11,6 +11,7 @@
 #include "init.h"
 #include "wifinetwork.h"
 #include "wifimeshnet.h"
+#include "tftpd.h"
 
 
 static const char *TAG = "esp32 main";
@@ -32,7 +33,11 @@ static void main_task ()
     wifimeshnet_init(meshcb);
 #endif // CONFIG_WIFI_MESH_NETWORK
 
-    ESP_LOGI(TAG,"FreeMemory:%d Bytes",esp_get_minimum_free_heap_size());
+#if CONFIG_LWIP_TFTPD_ON_BOOT == 1
+    tftpd_start();
+#endif // LWIP_TFTPD_ON_BOOT
+
+    ESP_LOGI(TAG,"FreeMemory:%d Bytes,Min FreeMemory:%d Bytes ",esp_get_free_heap_size(),esp_get_minimum_free_heap_size());
 
     while (1)
     {
