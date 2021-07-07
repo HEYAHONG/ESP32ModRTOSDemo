@@ -39,7 +39,9 @@ static void main_task ()
 #endif // LWIP_TFTPD_ON_BOOT
 
 #if CONFIG_NETWORK_PROTOCAL_MQTT == 1
+#if CONFIG_MQTT_CLIENT_ON_BOOT == 1
     mqttc_start();
+#endif // CONFIG_MQTT_CLIENT_ON_BOOT
 #endif // CONFIG_NETWORK_PROTOCAL_MQTT
 
     ESP_LOGI(TAG,"FreeMemory:%d Bytes,Min FreeMemory:%d Bytes ",esp_get_free_heap_size(),esp_get_minimum_free_heap_size());

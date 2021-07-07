@@ -3,3 +3,7 @@ config BROKER_URL
         default "mqtt://mqtt.eclipseprojects.io"
         help
             URL of the broker to connect to
+
+config MQTT_CLIENT_ON_BOOT
+	bool "start mqtt client on boot"
+	default y
