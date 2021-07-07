@@ -36,6 +36,14 @@ typedef struct
 //初始化wifimeshnet
 void wifimeshnet_init(wifimeshnet_callback_t callback);
 
+//停止wifimeshnet
+void wifimeshnet_stop();
+
+//重启wifimeshnet
+void wifimeshnet_restart();
+
+
+
 typedef struct
 {
     uint8_t mesh_id[6];

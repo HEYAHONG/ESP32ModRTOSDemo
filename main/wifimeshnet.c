@@ -273,6 +273,9 @@ void ip_event_handler(void *arg, esp_event_base_t event_base,
 #endif
 }
 
+static esp_event_handler_instance_t  wifimeshnet_event_ip_handler=NULL;
+static esp_event_handler_instance_t  wifimeshnet_event_mesh_handler=NULL;
+
 //初始化wifimeshnet
 void wifimeshnet_init(wifimeshnet_callback_t callback)
 {
@@ -285,13 +288,13 @@ void wifimeshnet_init(wifimeshnet_callback_t callback)
     /*  wifi initialization */
     wifi_init_config_t config = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&config));
-    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_handler, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_handler, NULL,&wifimeshnet_event_ip_handler));
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
     ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
     ESP_ERROR_CHECK(esp_wifi_start());
     /*  mesh initialization */
     ESP_ERROR_CHECK(esp_mesh_init());
-    ESP_ERROR_CHECK(esp_event_handler_register(MESH_EVENT, ESP_EVENT_ANY_ID, &mesh_event_handler, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_instance_register(MESH_EVENT, ESP_EVENT_ANY_ID, &mesh_event_handler, NULL,&wifimeshnet_event_mesh_handler));
     ESP_ERROR_CHECK(esp_mesh_set_max_layer(CONFIG_MESH_MAX_LAYER));
     ESP_ERROR_CHECK(esp_mesh_set_vote_percentage(1));
     ESP_ERROR_CHECK(esp_mesh_set_ap_assoc_expire(10));
@@ -525,6 +528,145 @@ void wifimeshnet_set_config(wifimeshnet_config_t *cfg)
     {
         free(config);
     }
+}
+
+//停止wifimeshnet
+void wifimeshnet_stop()
+{
+    esp_mesh_stop();
+    esp_wifi_stop();
+
+    if(wifimeshnet_event_ip_handler!=NULL)
+    {
+        esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP,wifimeshnet_event_ip_handler);
+        wifimeshnet_event_ip_handler=NULL;
+
+    }
+    if(wifimeshnet_event_mesh_handler!=NULL)
+    {
+        esp_event_handler_instance_unregister(MESH_EVENT, ESP_EVENT_ANY_ID, wifimeshnet_event_mesh_handler);
+        wifimeshnet_event_mesh_handler=NULL;
+    }
+}
+
+//重启wifimeshnet
+void wifimeshnet_restart()
+{
+    wifimeshnet_stop();
+
+    //重启WIFI
+    ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_handler, NULL,&wifimeshnet_event_ip_handler));
+    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
+    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
+    ESP_ERROR_CHECK(esp_wifi_start());
+
+    //重启mesh
+    ESP_ERROR_CHECK(esp_event_handler_instance_register(MESH_EVENT, ESP_EVENT_ANY_ID, &mesh_event_handler, NULL,&wifimeshnet_event_mesh_handler));
+    ESP_ERROR_CHECK(esp_mesh_set_max_layer(CONFIG_MESH_MAX_LAYER));
+    ESP_ERROR_CHECK(esp_mesh_set_vote_percentage(1));
+    ESP_ERROR_CHECK(esp_mesh_set_ap_assoc_expire(10));
+    mesh_cfg_t cfg = MESH_INIT_CONFIG_DEFAULT();
+    /* mesh ID */
+    memcpy((uint8_t *) &cfg.mesh_id, MESH_ID, 6);
+    /* router */
+    cfg.channel = CONFIG_MESH_CHANNEL;
+    cfg.router.ssid_len = strlen(CONFIG_MESH_ROUTER_SSID);
+    memcpy((uint8_t *) &cfg.router.ssid, CONFIG_MESH_ROUTER_SSID, cfg.router.ssid_len);
+    memcpy((uint8_t *) &cfg.router.password, CONFIG_MESH_ROUTER_PASSWD,
+           strlen(CONFIG_MESH_ROUTER_PASSWD));
+    /* mesh softAP */
+    ESP_ERROR_CHECK(esp_mesh_set_ap_authmode(CONFIG_MESH_AP_AUTHMODE));
+    cfg.mesh_ap.max_connection = CONFIG_MESH_AP_CONNECTIONS;
+    memcpy((uint8_t *) &cfg.mesh_ap.password, CONFIG_MESH_AP_PASSWD,
+           strlen(CONFIG_MESH_AP_PASSWD));
+
+    {//加载配置
+        cJSON *obj=system_config_get_item("wifimeshnet");
+        if(obj==NULL)
+        {
+            wifimeshnet_set_config(NULL);
+        }
+        else
+        {
+            if(cJSON_HasObjectItem(obj,"mesh_id"))
+            {
+                cJSON *item=cJSON_GetObjectItem(obj,"mesh_id");
+                if(cJSON_IsArray(item))
+                {
+                    for(size_t i=0;i<6;i++)
+                    {
+                        if(i<cJSON_GetArraySize(item))
+                        {
+                            if(cJSON_IsNumber(cJSON_GetArrayItem(item,i)))
+                            cfg.mesh_id.addr[i]=cJSON_GetNumberValue(cJSON_GetArrayItem(item,i));
+                        }
+                    }
+                }
+            }
+            if(cJSON_HasObjectItem(obj,"mesh_ap_password"))
+            {
+                 cJSON *item=cJSON_GetObjectItem(obj,"mesh_ap_password");
+                 if(cJSON_IsString(item))
+                 {
+                     char * str=cJSON_GetStringValue(item);
+                     memcpy((uint8_t *) &cfg.mesh_ap.password, str,strlen(str));
+                 }
+            }
+            if(cJSON_HasObjectItem(obj,"mesh_ap_max_connections"))
+            {
+                 cJSON *item=cJSON_GetObjectItem(obj,"mesh_ap_max_connections");
+                 if(cJSON_IsNumber(item))
+                 {
+                     cfg.mesh_ap.max_connection=cJSON_GetNumberValue(item);
+                 }
+            }
+            if(cJSON_HasObjectItem(obj,"mesh_channel"))
+            {
+                 cJSON *item=cJSON_GetObjectItem(obj,"mesh_channel");
+                if(cJSON_IsNumber(item))
+                 {
+                     cfg.channel=cJSON_GetNumberValue(item);
+                 }
+            }
+            if(cJSON_HasObjectItem(obj,"router_ssid"))
+            {
+                 cJSON *item=cJSON_GetObjectItem(obj,"router_ssid");
+                 if(cJSON_IsString(item))
+                 {
+                     char * str=cJSON_GetStringValue(item);
+                     memcpy((uint8_t *) &cfg.router.ssid, str,strlen(str));
+                 }
+            }
+            if(cJSON_HasObjectItem(obj,"router_password"))
+            {
+                 cJSON *item=cJSON_GetObjectItem(obj,"router_password");
+                 if(cJSON_IsString(item))
+                 {
+                     char * str=cJSON_GetStringValue(item);
+                     memcpy((uint8_t *) &cfg.router.password, str,strlen(str));
+                 }
+            }
+            if(cJSON_HasObjectItem(obj,"router_ssid_len"))
+            {
+                 cJSON *item=cJSON_GetObjectItem(obj,"router_ssid_len");
+                 if(cJSON_IsNumber(item))
+                 {
+                     cfg.router.ssid_len=cJSON_GetNumberValue(item);
+                 }
+            }
+
+
+            cJSON_Delete(obj);
+        }
+
+    }
+
+    ESP_ERROR_CHECK(esp_mesh_set_config(&cfg));
+    /* mesh start */
+    ESP_ERROR_CHECK(esp_mesh_start());
+    ESP_LOGI(MESH_TAG, "mesh starts successfully, heap:%d, %s\n",  esp_get_free_heap_size(),
+             esp_mesh_is_root_fixed() ? "root fixed" : "root not fixed");
+
 }
 
 #endif // CONFIG_WIFI_MESH_NETWORK
