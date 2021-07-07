@@ -36,6 +36,19 @@ typedef struct
 //初始化wifimeshnet
 void wifimeshnet_init(wifimeshnet_callback_t callback);
 
+typedef struct
+{
+    uint8_t mesh_id[6];
+    uint8_t mesh_ap_password[64];
+    size_t  mesh_ap_max_connections;
+    int mesh_channel;
+    uint8_t router_ssid[32];
+    size_t  router_ssid_len;
+    uint8_t router_password[64];
+} wifimeshnet_config_t;
+//设置配置参数
+void wifimeshnet_set_config(wifimeshnet_config_t *cfg);
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus
