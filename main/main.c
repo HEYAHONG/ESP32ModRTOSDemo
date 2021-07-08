@@ -40,7 +40,7 @@ static void main_task ()
 
 #if CONFIG_NETWORK_PROTOCAL_MQTT == 1
 #if CONFIG_MQTT_CLIENT_ON_BOOT == 1
-    mqttc_start();
+    mqttc_start(NULL,NULL);
 #endif // CONFIG_MQTT_CLIENT_ON_BOOT
 #endif // CONFIG_NETWORK_PROTOCAL_MQTT
 
@@ -49,7 +49,6 @@ static void main_task ()
     while (1)
     {
         vTaskDelay (2000 / portTICK_PERIOD_MS);
-
     }
 
 }

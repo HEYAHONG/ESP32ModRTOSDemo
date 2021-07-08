@@ -12,12 +12,19 @@ extern "C"
 {
 #endif // __cplusplus
 
+typedef void (*mqttc_event_callback_t)(esp_mqtt_event_handle_t event);
+typedef void (*mqttc_event_on_init_config_t)(esp_mqtt_client_config_t *mqtt_cfg);
+
 
 //启动mqtt
-void mqttc_start();
+void mqttc_start(mqttc_event_on_init_config_t on_cfg,mqttc_event_callback_t cb);
 
 //停止mqtt
 void mqttc_stop();
+
+
+//publish mqtt消息(包装库函数)
+bool mqttc_publish(const char *topic, const char *data, int len, int qos, int retain);
 
 #ifdef __cplusplus
 }

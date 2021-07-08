@@ -5,6 +5,9 @@
 
 static const char *TAG = "MQTT Client";
 
+mqttc_event_callback_t callback=NULL;
+mqttc_event_on_init_config_t on_config=NULL;
+
 /*
  * @brief Event handler registered to receive MQTT events
  *
@@ -19,6 +22,10 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 {
     ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
     esp_mqtt_event_handle_t event = event_data;
+    if(callback!=NULL)
+    {
+        callback(event);
+    }
     switch ((esp_mqtt_event_id_t)event_id) {
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
@@ -52,21 +59,36 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 
 
 
-esp_mqtt_client_handle_t client=NULL;
+static esp_mqtt_client_handle_t client=NULL;
 
 
 //启动mqtt
-void mqttc_start()
+void mqttc_start(mqttc_event_on_init_config_t on_cfg,mqttc_event_callback_t cb)
 {
+
+    if(client!=NULL)
+    {
+        mqttc_stop();
+    }
+
+    on_config=on_cfg;
+    callback=cb;
+
+
     esp_mqtt_client_config_t mqtt_cfg =
     {
         .uri = CONFIG_BROKER_URL,
     };
+
+    if(on_config!=NULL)
+    {
+        on_config(&mqtt_cfg);
+    }
+
     esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
     /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
     esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
     esp_mqtt_client_start(client);
-
 
 }
 
@@ -83,6 +105,15 @@ void mqttc_stop()
 
 }
 
+//publish mqtt消息(包装库函数)
+bool mqttc_publish(const char *topic, const char *data, int len, int qos, int retain)
+{
+    if(client!=NULL)
+    {
+        return 0<=esp_mqtt_client_publish(client,topic,data,len,qos,retain);
+    }
 
+    return false;
+}
 
 #endif // CONFIG_NETWORK_PROTOCAL_MQTT
