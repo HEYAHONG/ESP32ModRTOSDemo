@@ -26,6 +26,17 @@ source "$(PROJECT_PATH)/main/wifimeshnet.Kconfig"
 
 endif
 
+menuconfig ETHERNET_NETWORK
+        bool "Enable ethernet network"
+        default y
+
+if ETHERNET_NETWORK
+
+source "$(PROJECT_PATH)/main/ethernet.Kconfig"
+
+endif
+
+
 menu "Network Protocols"
 
 config LWIP_TFTPD_ON_BOOT
