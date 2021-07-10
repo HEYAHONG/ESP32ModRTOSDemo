@@ -28,7 +28,7 @@ endif
 
 menuconfig ETHERNET_NETWORK
         bool "Enable ethernet network"
-        default y
+        default n
 
 if ETHERNET_NETWORK
 

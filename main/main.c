@@ -11,6 +11,7 @@
 #include "init.h"
 #include "wifinetwork.h"
 #include "wifimeshnet.h"
+#include "ethernet.h"
 #include "tftpd.h"
 #include "mqtt.h"
 
@@ -18,13 +19,21 @@
 static const char *TAG = "esp32 main";
 
 #if CONFIG_WIFI_MESH_NETWORK == 1
-wifimeshnet_callback_t meshcb={NULL,NULL,NULL};
+static wifimeshnet_callback_t meshcb={NULL,NULL,NULL};
 #endif // CONFIG_WIFI_MESH_NETWORK
+
+#if CONFIG_ETHERNET_NETWORK == 1
+static ethernet_network_callback_t ethcb={NULL,NULL};
+#endif // CONFIG_ETHERNET_NETWORK
 
 static void main_task ()
 {
 
     system_init();
+
+#if CONFIG_ETHERNET_NETWORK == 1
+    ethernet_network_init(ethcb);
+#endif // CONFIG_ETHERNET_NETWORK
 
 #if CONFIG_WIFI_NETWORK == 1
     wifinetwork_init();
