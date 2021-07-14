@@ -368,6 +368,7 @@ void wifimeshnet_init(wifimeshnet_callback_t callback)
                  {
                      char * str=cJSON_GetStringValue(item);
                      memcpy((uint8_t *) &cfg.router.ssid, str,strlen(str));
+                     cfg.router.ssid_len=strlen(str);
                  }
             }
             if(cJSON_HasObjectItem(obj,"router_password"))
@@ -379,6 +380,8 @@ void wifimeshnet_init(wifimeshnet_callback_t callback)
                      memcpy((uint8_t *) &cfg.router.password, str,strlen(str));
                  }
             }
+
+            /*
             if(cJSON_HasObjectItem(obj,"router_ssid_len"))
             {
                  cJSON *item=cJSON_GetObjectItem(obj,"router_ssid_len");
@@ -387,6 +390,7 @@ void wifimeshnet_init(wifimeshnet_callback_t callback)
                      cfg.router.ssid_len=cJSON_GetNumberValue(item);
                  }
             }
+            */
 
 
             cJSON_Delete(obj);
@@ -509,10 +513,12 @@ void wifimeshnet_set_config(wifimeshnet_config_t *cfg)
                 cJSON_AddItemToObject(obj,"router_password",router_password);
             }
 
+            /*
             {//router_ssid_len
                 cJSON *router_ssid_len=cJSON_CreateNumber(config->router_ssid_len);
                 cJSON_AddItemToObject(obj,"router_ssid_len",router_ssid_len);
             }
+            */
 
 
         }
@@ -635,6 +641,9 @@ void wifimeshnet_restart()
                  {
                      char * str=cJSON_GetStringValue(item);
                      memcpy((uint8_t *) &cfg.router.ssid, str,strlen(str));
+
+                     //设置strlen
+                     cfg.router.ssid_len=strlen(str);
                  }
             }
             if(cJSON_HasObjectItem(obj,"router_password"))
@@ -646,6 +655,7 @@ void wifimeshnet_restart()
                      memcpy((uint8_t *) &cfg.router.password, str,strlen(str));
                  }
             }
+            /*
             if(cJSON_HasObjectItem(obj,"router_ssid_len"))
             {
                  cJSON *item=cJSON_GetObjectItem(obj,"router_ssid_len");
@@ -654,6 +664,7 @@ void wifimeshnet_restart()
                      cfg.router.ssid_len=cJSON_GetNumberValue(item);
                  }
             }
+            */
 
 
             cJSON_Delete(obj);
