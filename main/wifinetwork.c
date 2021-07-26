@@ -249,6 +249,7 @@ static void wifinetwork_ap_init()
                     memcpy(wifi_config.ap.ssid,
                            cJSON_GetStringValue(ssid),
                            sizeof(wifi_config.ap.ssid)>strlen(cJSON_GetStringValue(ssid))?strlen(cJSON_GetStringValue(ssid)):sizeof(wifi_config.ap.ssid));
+                    wifi_config.ap.ssid_len=strlen((char *)wifi_config.ap.ssid);
                 }
 
                 if(cJSON_IsString(password))
