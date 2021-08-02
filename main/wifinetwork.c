@@ -170,8 +170,8 @@ static void wifinetwork_sta_init()
     if(strlen((char *)wifi_config.sta.ssid)!=0)
     {
         wifinetworkstate.station_is_enable=true;
-        ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
     }
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
 }
 
 #endif // CONFIG_WIFI_NETWORK_SOFTAP
@@ -276,8 +276,8 @@ static void wifinetwork_ap_init()
     if(strlen((char *)wifi_config.ap.ssid) != 0 )
     {
         wifinetworkstate.ap_is_enable=true;
-        ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
     }
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
 
 }
 #endif // CONFIG_WIFI_NETWORK_STA
