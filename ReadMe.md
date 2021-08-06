@@ -21,6 +21,10 @@
 
 根据平台不同，CMake还可支持nijia/Eclipse CDT等类型。
 
+## ESP-IDF版本
+
+- 已测试分支：Release/v4.3
+
 ## 注意
 
 为了精简Kconfig大小，分离了Kconfig文件。因此，除了在需要在esp-idf下执行以下指令，在本工程目录下也需要执行以下指令(若esp-idf安装在默认目录~/esp/esp-idf，只需要在本工程目录下执行):
