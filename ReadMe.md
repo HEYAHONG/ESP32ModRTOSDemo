@@ -14,16 +14,16 @@
 
 环境安装正确后可采用以下方式编译（由SDK提供）：
 
-- 直接在工程目录使用make命令编译烧录
 - 使用CMAKE生成工程文件，再根据工程类型（CMake支持的工程类型，下面均为个人习惯的类型）进行编译：
   - 默认状态下生成可使用make进行编译的工程。
   - 生成codeblocks工程文件，再使用codeblocks编译（编译之前需确定环境变量设置正确）
+- ESP IDF支持的方式（idf.py）。
 
 根据平台不同，CMake还可支持nijia/Eclipse CDT等类型。
 
 ## ESP-IDF版本
 
-- 已测试分支：Release/v4.3
+- 已测试分支：master (20211229)
 
 ## 注意
 
