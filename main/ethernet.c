@@ -83,7 +83,7 @@ void ethernet_network_init(ethernet_network_callback_t cb)
     esp_netif_config_t cfg = ESP_NETIF_DEFAULT_ETH();
     esp_netif_t *eth_netif = esp_netif_new(&cfg);
     // Set default handlers to process TCP/IP stuffs
-    ESP_ERROR_CHECK(esp_eth_set_default_handlers(eth_netif));
+    //ESP_ERROR_CHECK(esp_eth_set_default_handlers(eth_netif));
     // Register user defined event handers
     ESP_ERROR_CHECK(esp_event_handler_register(ETH_EVENT, ESP_EVENT_ANY_ID, &eth_event_handler, NULL));
     ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_ETH_GOT_IP, &got_ip_event_handler, NULL));
@@ -101,7 +101,7 @@ void ethernet_network_init(ethernet_network_callback_t cb)
 #elif CONFIG_ETHERNET_NETWORK_ETH_PHY_RTL8201 == 1
     esp_eth_phy_t *phy = esp_eth_phy_new_rtl8201(&phy_config);
 #elif CONFIG_ETHERNET_NETWORK_ETH_PHY_LAN8720 ==1
-    esp_eth_phy_t *phy = esp_eth_phy_new_lan8720(&phy_config);
+    esp_eth_phy_t *phy = esp_eth_phy_new_lan87xx(&phy_config);
 #elif CONFIG_ETHERNET_NETWORK_ETH_PHY_DP83848 == 1
     esp_eth_phy_t *phy = esp_eth_phy_new_dp83848(&phy_config);
 #elif CONFIG_ETHERNET_NETWORK_ETH_PHY_KSZ8041 == 1
