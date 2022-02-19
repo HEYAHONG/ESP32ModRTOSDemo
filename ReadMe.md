@@ -8,6 +8,18 @@
 - spiffs文件系统(文件读写及编译时生成镜像)。
 - tftp服务器,可采用tftp工具在线修改spiffs文件系统的内容。
 
+## 源代码下载
+
+由于本源代码包含第三方源代码,故直接下载可能有部分源代码缺失，需要通过以下方法解决:
+
+- 在进行git clone 使用--recurse-submodules参数。
+
+- 若已通过git clone下载,则在源代码目录中执行以下命令下载子模块:
+
+  ```bash
+   git submodule update --init --recursive
+  ```
+
 # 编译
 
 本工程中没有包含SDK源代码文件，因此首先应该正确安装并使用[esp-idf](https://github.com/espressif/esp-idf) 。本工程中的编译方式同SDK中example中的工程相同（安装完成后可尝试编译SDK中的example中的工程，成功后再使用cd命令切换到本工程目录编译）。本工程暂时只支持在linux或wsl(wsl2)下编译。
