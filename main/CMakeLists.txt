@@ -1,5 +1,6 @@
-set(COMPONENT_SRCS "main.c"  "tftpd.c" "init.c" "wifinetwork.c" "mqtt.c" "wifimeshnet.c" "mesh_netif/mesh_netif.c" "ethernet.c")
-set(COMPONENT_ADD_INCLUDEDIRS "." "mesh_netif" )
+file(GLOB  SOURCE_C_CPP_FILES  *.c   *.cpp   mesh_netif/*.c appstack/*.c appstack/*.cpp )
+set(COMPONENT_SRCS ${SOURCE_C_CPP_FILES})
+set(COMPONENT_ADD_INCLUDEDIRS "." "mesh_netif" "appstack" )
 
 #默认框架中为启用tftp,在此处启用
 set(COMPONENT_SRCS ${COMPONENT_SRCS} tftp/tftp_server.c)
