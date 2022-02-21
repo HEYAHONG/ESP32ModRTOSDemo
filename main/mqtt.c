@@ -24,7 +24,10 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     esp_mqtt_event_handle_t event = event_data;
     if(callback!=NULL)
     {
-        callback(event);
+        if(callback(event_id,event))
+        {
+            return;//已处理直接返回
+        }
     }
     switch ((esp_mqtt_event_id_t)event_id) {
     case MQTT_EVENT_CONNECTED:
