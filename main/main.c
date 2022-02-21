@@ -14,6 +14,7 @@
 #include "ethernet.h"
 #include "tftpd.h"
 #include "mqtt.h"
+#include "app.h"
 
 
 static const char *TAG = "esp32 main";
@@ -53,11 +54,14 @@ static void main_task ()
 #endif // CONFIG_MQTT_CLIENT_ON_BOOT
 #endif // CONFIG_NETWORK_PROTOCAL_MQTT
 
+    app_init();
+
     ESP_LOGI(TAG,"FreeMemory:%d Bytes,Min FreeMemory:%d Bytes ",esp_get_free_heap_size(),esp_get_minimum_free_heap_size());
 
     while (1)
     {
-        vTaskDelay (2000 / portTICK_PERIOD_MS);
+        app_loop();
+        vTaskDelay (pdMS_TO_TICKS(100));
     }
 
 }

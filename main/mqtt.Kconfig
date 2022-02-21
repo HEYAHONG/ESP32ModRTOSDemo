@@ -6,4 +6,9 @@ config BROKER_URL
 
 config MQTT_CLIENT_ON_BOOT
 	bool "start mqtt client on boot"
-	default y
+	default n
+
+config MQTT_CLIENT_USE_SMGS
+        bool "Use SimpleMQTTGateWayStack"
+        default y
+        depends on !MQTT_CLIENT_ON_BOOT

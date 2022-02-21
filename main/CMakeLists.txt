@@ -1,4 +1,4 @@
-file(GLOB  SOURCE_C_CPP_FILES  *.c   *.cpp   mesh_netif/*.c appstack/*.c appstack/*.cpp )
+file(GLOB  SOURCE_C_CPP_FILES  *.c   *.cpp   mesh_netif/*.c mesh_netif/*.cpp  appstack/*.c appstack/*.cpp )
 set(COMPONENT_SRCS ${SOURCE_C_CPP_FILES})
 set(COMPONENT_ADD_INCLUDEDIRS "." "mesh_netif" "appstack" )
 
