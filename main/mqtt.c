@@ -80,8 +80,12 @@ void mqttc_start(mqttc_event_on_init_config_t on_cfg,mqttc_event_callback_t cb)
 
     esp_mqtt_client_config_t mqtt_cfg =
     {
-        .uri = CONFIG_BROKER_URL,
+        .broker.address.uri = CONFIG_BROKER_URL,
     };
+
+    //调整重试时间
+    mqtt_cfg.network.reconnect_timeout_ms=3000;
+    mqtt_cfg.network.disable_auto_reconnect=false;
 
     if(on_config!=NULL)
     {

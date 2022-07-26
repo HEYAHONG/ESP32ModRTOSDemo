@@ -243,22 +243,22 @@ static void mqttc_event_on_init_config(esp_mqtt_client_config_t *mqtt_cfg)
     memset(&will,0,sizeof(will));
     SMGS_GateWay_Will_Encode(&gateway_context,&will,willbuff,sizeof(willbuff));
 
-    mqtt_cfg->protocol_ver=MQTT_PROTOCOL_V_3_1_1;
+    mqtt_cfg->session.protocol_ver=MQTT_PROTOCOL_V_3_1_1;
 
-    mqtt_cfg->lwt_topic=will.topic;
-    mqtt_cfg->lwt_msg=(const char *)will.payload;
-    mqtt_cfg->lwt_msg_len=will.payloadlen;
-    mqtt_cfg->lwt_qos=will.qos;
-    mqtt_cfg->lwt_retain=will.ratain;
+    mqtt_cfg->session.last_will.topic=will.topic;
+    mqtt_cfg->session.last_will.msg=(const char *)will.payload;
+    mqtt_cfg->session.last_will.msg_len=will.payloadlen;
+    mqtt_cfg->session.last_will.qos=will.qos;
+    mqtt_cfg->session.last_will.retain=will.ratain;
 
 
     //keepalive
-    mqtt_cfg->keepalive=120;
+    mqtt_cfg->session.keepalive=120;
 
     //clientid、用户名、密码
-    mqtt_cfg->client_id=gateway_context.GateWaySerialNumber;
-    mqtt_cfg->username=gateway_context.GateWaySerialNumber;
-    mqtt_cfg->password=gateway_context.GateWaySerialNumber;
+    mqtt_cfg->credentials.client_id=gateway_context.GateWaySerialNumber;
+    mqtt_cfg->credentials.username=gateway_context.GateWaySerialNumber;
+    mqtt_cfg->credentials.authentication.password=gateway_context.GateWaySerialNumber;
 
 }
 
