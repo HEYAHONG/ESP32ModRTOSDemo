@@ -1,4 +1,5 @@
 ﻿#include "mqtt.h"
+#include "RC.h"
 
 #if CONFIG_NETWORK_PROTOCAL_MQTT == 1
 
@@ -86,6 +87,25 @@ void mqttc_start(mqttc_event_on_init_config_t on_cfg,mqttc_event_callback_t cb)
     //调整重试时间
     mqtt_cfg.network.reconnect_timeout_ms=3000;
     mqtt_cfg.network.disable_auto_reconnect=false;
+
+    {
+        //内置emqx证书
+        const char *rc=NULL;
+        if((rc=(const char *)RCGetHandle("emqx/cacert.pem"))!=NULL)
+        {
+            mqtt_cfg.broker.verification.use_global_ca_store=false;
+            mqtt_cfg.broker.verification.skip_cert_common_name_check=true;
+            mqtt_cfg.broker.verification.certificate=rc;
+        }
+        if((rc=(const char *)RCGetHandle("emqx/client-cert.pem"))!=NULL)
+        {
+            mqtt_cfg.credentials.authentication.certificate=rc;
+        }
+        if((rc=(const char *)RCGetHandle("emqx/client-key.pem"))!=NULL)
+        {
+            mqtt_cfg.credentials.authentication.key=rc;
+        }
+    }
 
     if(on_config!=NULL)
     {

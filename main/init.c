@@ -12,7 +12,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
-
+#include  "RC.h"
 
 
 static const char *TAG = "esp32 init";
@@ -124,6 +124,15 @@ void init_json()
 //初始化
 void system_init()
 {
+
+
+    {
+        char * banner=(char *)RCGetHandle("banner");
+        if(banner!=NULL)
+            ESP_LOGI(TAG,"\r\n%s\r\n",banner);
+    }
+
+
     ESP_ERROR_CHECK(nvs_flash_init());
 
     ESP_ERROR_CHECK(esp_netif_init());
