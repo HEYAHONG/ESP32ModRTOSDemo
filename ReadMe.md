@@ -35,7 +35,7 @@
 
 ## ESP-IDF版本
 
-- 已测试分支：master(git:36f49f361c001b49c538364056bc5d2d04c6f321)
+- 已测试分支：master(git version:afc6fba7f5619af82623f22052685bbcc6fb5665 )
 
 ## 注意
 

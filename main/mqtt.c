@@ -1,5 +1,6 @@
 ﻿#include "mqtt.h"
 #include "RC.h"
+#include <inttypes.h>
 
 #if CONFIG_NETWORK_PROTOCAL_MQTT == 1
 
@@ -21,7 +22,7 @@ mqttc_event_on_init_config_t on_config=NULL;
  */
 static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
-    ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
+    ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%" PRIu32 , base, event_id);
     esp_mqtt_event_handle_t event = event_data;
     if(callback!=NULL)
     {

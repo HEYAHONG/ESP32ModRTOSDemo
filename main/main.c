@@ -16,7 +16,7 @@
 #include "mqtt.h"
 #include "app.h"
 #include "RC.h"
-
+#include <inttypes.h>
 
 static const char *TAG = "esp32 main";
 
@@ -57,7 +57,7 @@ static void main_task ()
 
     app_init();
 
-    ESP_LOGI(TAG,"FreeMemory:%d Bytes,Min FreeMemory:%d Bytes ",esp_get_free_heap_size(),esp_get_minimum_free_heap_size());
+    ESP_LOGI(TAG,"FreeMemory:%" PRIu32 " Bytes,Min FreeMemory:%" PRIu32 " Bytes ",esp_get_free_heap_size(),esp_get_minimum_free_heap_size());
 
     while (1)
     {
