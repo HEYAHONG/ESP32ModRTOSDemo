@@ -18,6 +18,6 @@ spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)
 add_subdirectory(SimpleMQTTGateWayStack/lib)
 target_link_libraries(${COMPONENT_LIB} SMGS)
 
-#添加SimpleMQTTGateWayStack库
+#添加RC库
 add_subdirectory(rc)
 target_link_libraries(${COMPONENT_LIB} RC)
