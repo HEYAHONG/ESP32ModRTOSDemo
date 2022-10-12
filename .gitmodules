@@ -1,3 +1,6 @@
 [submodule "main/SimpleMQTTGateWayStack"]
 	path = main/SimpleMQTTGateWayStack
 	url = ../../HEYAHONG/SimpleMQTTGateWayStack.git
+[submodule "esp-idf"]
+	path = esp-idf
+	url = ../../espressif/esp-idf.git

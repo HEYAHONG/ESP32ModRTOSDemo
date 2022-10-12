@@ -22,7 +22,19 @@
 
 # 编译
 
-本工程中没有包含SDK源代码文件，因此首先应该正确安装并使用[esp-idf](https://github.com/espressif/esp-idf) 。本工程中的编译方式同SDK中example中的工程相同（安装完成后可尝试编译SDK中的example中的工程，成功后再使用cd命令切换到本工程目录编译）。本工程暂时只支持在linux或wsl(wsl2)下编译。
+## 编译环境安装
+
+注意:仅支持github.com下载的代码，其他方式下载的代码需要完全按照官方的说明安装。
+
+### Linux / WSL
+
+执行工程目录下的 bootstrap.sh，当提示 初始化完成时 即表示编译环境安装完成。
+
+### 其它
+
+进入 [esp-idf](esp-idf/) 目录,安装官方的说明安装。
+
+## 编译说明
 
 环境安装正确后可采用以下方式编译（由SDK提供）：
 
@@ -35,9 +47,13 @@
 
 ## ESP-IDF版本
 
-- 已测试分支：master(git version:afc6fba7f5619af82623f22052685bbcc6fb5665 )
+若使用bootstrap.sh安装编译环境,无需注意此提示。
+
+- 已测试分支：master(git version:fa5d0a351343b45ee06d221b7c29028672a4c3c2 )
 
 ## 注意
+
+若使用bootstrap.sh安装编译环境,无需注意此提示。
 
 为了精简Kconfig大小，分离了Kconfig文件。因此，除了在需要在esp-idf下执行以下指令，在本工程目录下也需要执行以下指令(若esp-idf安装在默认目录~/esp/esp-idf，只需要在本工程目录下执行):
 
