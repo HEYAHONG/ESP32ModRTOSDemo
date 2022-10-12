@@ -20,6 +20,30 @@
    git submodule update --init --recursive
   ```
 
+## 资源文件
+
+类似于桌面程序的资源文件。源代码实现的目录为 [main/rc](main/rc/)。
+
+在固件编写中，很多时候需要大量的固定数据，直接手工嵌入到C文件里比较麻烦。
+
+通过读取文件转换到对应C文件可大大节省时间，可添加常用的文件（如各种证书）或者不适宜放在可读写的文件系统中的文件(如需要在格式化中保留或者初始参数)。转换程序源代码为[main/rc/fsgen.cpp](main/rc/fsgen.cpp)。
+
+使用步骤如下:
+
+- 将待添加的文件放入 main/rc/fs目录下。
+
+- 使用文件名调用以下函数(需包含相应头文件RC.h):
+
+  ```c++
+  //通过名称获取资源大小
+  size_t RCGetSize(const char * name);
+  
+  //通过名称获取资源指针
+  const unsigned char * RCGetHandle(const char * name);
+  ```
+
+
+
 # 编译
 
 ## 编译环境安装
