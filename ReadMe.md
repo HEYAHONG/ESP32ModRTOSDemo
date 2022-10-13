@@ -54,6 +54,8 @@
 
 执行工程目录下的 bootstrap.sh，当提示 初始化完成时 即表示编译环境安装完成。
 
+注意: bootstrap.sh主要用于进入编译环境,执行bootstrap.sh前需保证当前环境能正常使用esp-idf编译例程。每次打开终端后，如需进行工程编译,就需要执行 bootstrap.sh,若未关闭终端,无需重复执行 bootstrap.sh 。
+
 ### 其它
 
 进入 [esp-idf](esp-idf/) 目录,安装官方的说明安装。
