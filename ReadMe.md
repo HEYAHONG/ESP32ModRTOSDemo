@@ -2,6 +2,14 @@
 
 本工程为使用[esp-idf](https://github.com/espressif/esp-idf) 进行编程的Demo。整理一些基础功能以快速开发新应用，主要目标soc为ESP32。
 
+## 以太网
+
+ESP32支持以太网需要收发器,本人采用LAN8720作为收发器。对于ESP32连接如下图:
+
+![ETH-LAN8720](doc/ETH-LAN8720.png)
+
+其中REFC_1为以太网时钟,ETH_EN为芯片使能(LAN8720芯片的复位脚)。
+
 ## 功能
 
 - 常用网络功能的Kconfig配置(WIFI、以太网)。
