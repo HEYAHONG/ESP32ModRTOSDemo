@@ -36,6 +36,8 @@ CheckTool sed
 [ $? -eq 0 ] || exit;
 CheckTool python3
 [ $? -eq 0 ] || exit;
+CheckTool grep
+[ $? -eq 0 ] || exit;
 #设置ROOT_PATH变量
 
 self_path=""
@@ -78,6 +80,12 @@ echo "设置 PROJECT_PATH 为 '${PROJECT_PATH}'"
 echo -e  "\033[44;37m正在初始化SDK环境\033[40;37m";
 # 更换下载地址
 export IDF_GITHUB_ASSETS="dl.espressif.com/github_assets"
+# 检查是否从github.com下载，否则修改url
+if [ -z "`git config --get --worktree remote.origin.url |grep github.com`"  ] ;
+then echo "源代码不是从github.com下载,将修改Url。" ;
+git config  --worktree --replace-all remote.origin.url https://github.com/HEYAHONG/ESP32ModRTOSDemo.git
+fi
+
 cd ${SDK_PATH}
 function InstallFailure
 {
