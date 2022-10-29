@@ -50,7 +50,19 @@ ESP32支持以太网需要收发器,本人采用LAN8720作为收发器。对于E
   const unsigned char * RCGetHandle(const char * name);
   ```
 
+## SPIFFS
 
+ spiffs是一个用于嵌入式目标上的SPI NOR flash设备的文件系统。挂载spiffs后可直接以文件的形式进行数据的存储(可读可写)。
+
+### 预置的镜像
+
+可预先将一些文件放入文件系统,可直接在挂载后访问(可读可写)。
+
+目录:[spiffs_image](spiffs_image)
+
+### 挂载
+
+默认情况下,挂载的目录为/spiffs,具体参见 [main/init.c](main/init.c)
 
 # 编译
 
