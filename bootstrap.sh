@@ -100,4 +100,4 @@ source ./export.sh
 cd ${ROOT_PATH}
 
 echo -e  "\033[44;37mSDK环境初始化完毕!\033[40;37m";
-${SHELL}
+exec ${SHELL}
