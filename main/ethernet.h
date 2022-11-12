@@ -17,8 +17,8 @@ extern "C"
 
 typedef struct
 {
-    void (*eth_event_handler)(void *arg, esp_event_base_t event_base,int32_t event_id, void *event_data);
-    void (*got_ip_event_handler)(void *arg, esp_event_base_t event_base,int32_t event_id, void *event_data);
+    void (*eth_event_handler)(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
+    void (*got_ip_event_handler)(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
 } ethernet_network_callback_t;
 
 //初始化ethernet

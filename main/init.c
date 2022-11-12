@@ -66,14 +66,14 @@ static void init_spiffs()
 
 
 //全局配置文件json
-static cJSON * golbalconfig=NULL;
-static SemaphoreHandle_t golbalconfig_mutex=NULL;
+static cJSON *golbalconfig = NULL;
+static SemaphoreHandle_t golbalconfig_mutex = NULL;
 
 void init_json()
 {
     {
         //采用FreeRTOS的分配函数(方便修改)
-        cJSON_Hooks cjson_hook=
+        cJSON_Hooks cjson_hook =
         {
             pvPortMalloc,
             vPortFree
@@ -82,22 +82,22 @@ void init_json()
     }
     {
         //加载文件内容
-        FILE * fp=fopen("/spiffs/"CONFIG_GOLBAL_CONFIG_FILENAME,"r");
-        if(fp!=NULL)
+        FILE *fp = fopen("/spiffs/"CONFIG_GOLBAL_CONFIG_FILENAME, "r");
+        if (fp != NULL)
         {
-            fseek(fp,0,SEEK_END);
+            fseek(fp, 0, SEEK_END);
 
-            size_t length=ftell(fp);
+            size_t length = ftell(fp);
 
-            char *buff=pvPortMalloc(length+1);
+            char *buff = pvPortMalloc(length + 1);
 
-            memset(buff,0,length+1);
+            memset(buff, 0, length + 1);
 
-            fseek(fp,0,SEEK_SET);
+            fseek(fp, 0, SEEK_SET);
 
-            fread(buff,1,length,fp);
+            fread(buff, 1, length, fp);
 
-            golbalconfig=cJSON_ParseWithLength(buff,length);
+            golbalconfig = cJSON_ParseWithLength(buff, length);
 
             vPortFree(buff);
 
@@ -105,18 +105,18 @@ void init_json()
         }
         else
         {
-            ESP_LOGI(TAG,"Load "CONFIG_GOLBAL_CONFIG_FILENAME" from spiffs failed!");
+            ESP_LOGI(TAG, "Load "CONFIG_GOLBAL_CONFIG_FILENAME" from spiffs failed!");
         }
     }
 
-    if(golbalconfig==NULL)
+    if (golbalconfig == NULL)
     {
-        golbalconfig=cJSON_Parse(DEFAULT_GOLBAL_CONFIG_JSON);
+        golbalconfig = cJSON_Parse(DEFAULT_GOLBAL_CONFIG_JSON);
     }
 
     {
         //创建锁
-        golbalconfig_mutex=xSemaphoreCreateMutex();
+        golbalconfig_mutex = xSemaphoreCreateMutex();
 
         xSemaphoreGive(golbalconfig_mutex);
     }
@@ -127,9 +127,9 @@ void system_init()
 
 
     {
-        char * banner=(char *)RCGetHandle("banner");
-        if(banner!=NULL)
-            ESP_LOGI(TAG,"\r\n%s\r\n",banner);
+        char *banner = (char *)RCGetHandle("banner");
+        if (banner != NULL)
+            ESP_LOGI(TAG, "\r\n%s\r\n", banner);
     }
 
 
@@ -151,24 +151,24 @@ void system_init()
 
 void system_config_save()
 {
-    if(golbalconfig==NULL)
+    if (golbalconfig == NULL)
     {
         return;
     }
 
-    FILE *fp=fopen("/spiffs/"CONFIG_GOLBAL_CONFIG_FILENAME,"w");
-    if(fp!=NULL)
+    FILE *fp = fopen("/spiffs/"CONFIG_GOLBAL_CONFIG_FILENAME, "w");
+    if (fp != NULL)
     {
 
 
         xSemaphoreTake(golbalconfig_mutex, portMAX_DELAY);
 
-        char * buff=cJSON_Print(golbalconfig);
+        char *buff = cJSON_Print(golbalconfig);
 
 
         xSemaphoreGive(golbalconfig_mutex);
 
-        fwrite(buff,strlen(buff),1,fp);
+        fwrite(buff, strlen(buff), 1, fp);
 
         cJSON_free(buff);
 
@@ -176,19 +176,19 @@ void system_config_save()
     }
 }
 
-void system_config_put_item(cJSON *item,const char * name)
+void system_config_put_item(cJSON *item, const char *name)
 {
-    if(golbalconfig==NULL)
+    if (golbalconfig == NULL)
     {
         return;
     }
 
-    if(item==NULL)
+    if (item == NULL)
     {
         return ;
     }
 
-    if(name == NULL || strlen(name)==0)
+    if (name == NULL || strlen(name) == 0)
     {
         return;
     }
@@ -196,27 +196,27 @@ void system_config_put_item(cJSON *item,const char * name)
 
     xSemaphoreTake(golbalconfig_mutex, portMAX_DELAY);
 
-    if(cJSON_HasObjectItem(golbalconfig,name))
+    if (cJSON_HasObjectItem(golbalconfig, name))
     {
-        cJSON_DeleteItemFromObject(golbalconfig,name);
+        cJSON_DeleteItemFromObject(golbalconfig, name);
     }
 
-    cJSON *obj=cJSON_Duplicate(item,1);
+    cJSON *obj = cJSON_Duplicate(item, 1);
 
-    cJSON_AddItemToObject(golbalconfig,name,obj);
+    cJSON_AddItemToObject(golbalconfig, name, obj);
 
     xSemaphoreGive(golbalconfig_mutex);
 }
 
-cJSON * system_config_get_item(const char *name)
+cJSON *system_config_get_item(const char *name)
 {
 
-    if(golbalconfig==NULL)
+    if (golbalconfig == NULL)
     {
         return NULL;
     }
 
-    if(name == NULL || strlen(name)==0)
+    if (name == NULL || strlen(name) == 0)
     {
         return NULL;
     }
@@ -224,11 +224,11 @@ cJSON * system_config_get_item(const char *name)
 
     xSemaphoreTake(golbalconfig_mutex, portMAX_DELAY);
 
-    cJSON *ret=NULL;
+    cJSON *ret = NULL;
 
-    if(cJSON_HasObjectItem(golbalconfig,name))
+    if (cJSON_HasObjectItem(golbalconfig, name))
     {
-        ret= cJSON_Duplicate(cJSON_GetObjectItem(golbalconfig,name),1);
+        ret = cJSON_Duplicate(cJSON_GetObjectItem(golbalconfig, name), 1);
     }
 
     xSemaphoreGive(golbalconfig_mutex);

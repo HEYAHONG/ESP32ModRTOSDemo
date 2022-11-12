@@ -11,30 +11,30 @@
   * @param write Flag indicating read (0) or write (!= 0) access
   * @returns File handle supplied to other functions
   */
-static void* tftpd_open(const char* fname, const char* mode, u8_t write)
+static void *tftpd_open(const char *fname, const char *mode, u8_t write)
 {
-    const char *filemode="r";
-    if(write)
+    const char *filemode = "r";
+    if (write)
     {
-        filemode="w";
+        filemode = "w";
     }
-    if(strcmp(mode,"octet")==0)
+    if (strcmp(mode, "octet") == 0)
     {
-        filemode="rb";
-        if(write)
+        filemode = "rb";
+        if (write)
         {
-            filemode="wb";
+            filemode = "wb";
         }
     }
 
-    char * filename=(char *)malloc(strlen(fname)+20);
+    char *filename = (char *)malloc(strlen(fname) + 20);
 
-    memset(filename,0,strlen(fname)+20);
+    memset(filename, 0, strlen(fname) + 20);
 
-    memcpy(filename,"/spiffs/",sizeof("/spiffs/"));//将读写转换至spiffs
-    strcat(filename,fname);
+    memcpy(filename, "/spiffs/", sizeof("/spiffs/")); //将读写转换至spiffs
+    strcat(filename, fname);
 
-    void * ret=fopen(filename,filemode);
+    void *ret = fopen(filename, filemode);
 
     free(filename);
 
@@ -44,9 +44,9 @@ static void* tftpd_open(const char* fname, const char* mode, u8_t write)
  * Close file handle
  * @param handle File handle returned by open()
  */
-static void tftpd_close(void* handle)
+static void tftpd_close(void *handle)
 {
-    if(handle == NULL)
+    if (handle == NULL)
     {
         return;
     }
@@ -60,16 +60,16 @@ static void tftpd_close(void* handle)
  * @param bytes Number of bytes to copy to buf
  * @returns &gt;= 0: Success; &lt; 0: Error
  */
-static int tftpd_read(void* handle, void* buf, int bytes)
+static int tftpd_read(void *handle, void *buf, int bytes)
 {
-    if(handle ==NULL)
+    if (handle == NULL)
     {
         return -1;
     }
 
 
 
-    return fread(buf,1,bytes,(FILE *)handle);
+    return fread(buf, 1, bytes, (FILE *)handle);
 }
 /**
  * Write to file
@@ -79,17 +79,17 @@ static int tftpd_read(void* handle, void* buf, int bytes)
  *             TFTP headers are stripped off.
  * @returns &gt;= 0: Success; &lt; 0: Error
  */
-static int tftpd_write(void* handle, struct pbuf* p)
+static int tftpd_write(void *handle, struct pbuf *p)
 {
-    if(handle ==NULL)
+    if (handle == NULL)
     {
         return -1;
     }
 
-    return fwrite(p->payload,1,p->len,(FILE *)handle);
+    return fwrite(p->payload, 1, p->len, (FILE *)handle);
 }
 
-static struct tftp_context ctx=
+static struct tftp_context ctx =
 {
     tftpd_open,
     tftpd_close,

@@ -74,4 +74,4 @@ esp_err_t mesh_netif_start_root_ap(bool is_root, uint32_t dns_addr);
  *
  * @return Pointer to MAC address
  */
-uint8_t* mesh_netif_get_station_mac(void);
+uint8_t *mesh_netif_get_station_mac(void);

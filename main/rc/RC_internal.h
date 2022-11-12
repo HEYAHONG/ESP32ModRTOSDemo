@@ -7,10 +7,10 @@
 //资源信息结构体
 typedef struct
 {
-size_t data_offset;
-size_t data_size;
-size_t name_offset;
-size_t name_size;
+    size_t data_offset;
+    size_t data_size;
+    size_t name_offset;
+    size_t name_size;
 } RC_Info_t;
 
 extern const unsigned char RC_Data[];

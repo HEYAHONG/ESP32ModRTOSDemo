@@ -15,7 +15,7 @@
 
 #if CONFIG_ETHERNET_NETWORK == 1
 
-static ethernet_network_callback_t callback={NULL,NULL};
+static ethernet_network_callback_t callback = {NULL, NULL};
 
 static const char *TAG = "ethernet_network";
 
@@ -23,16 +23,17 @@ static const char *TAG = "ethernet_network";
 static void eth_event_handler(void *arg, esp_event_base_t event_base,
                               int32_t event_id, void *event_data)
 {
-    if(callback.eth_event_handler!=NULL)
+    if (callback.eth_event_handler != NULL)
     {
-        callback.eth_event_handler(arg,event_base,event_id,event_data);
+        callback.eth_event_handler(arg, event_base, event_id, event_data);
     }
 
     uint8_t mac_addr[6] = {0};
     /* we can get the ethernet driver handle from event data */
     esp_eth_handle_t eth_handle = *(esp_eth_handle_t *)event_data;
 
-    switch (event_id) {
+    switch (event_id)
+    {
     case ETHERNET_EVENT_CONNECTED:
         esp_eth_ioctl(eth_handle, ETH_CMD_G_MAC_ADDR, mac_addr);
         ESP_LOGI(TAG, "Ethernet Link Up");
@@ -58,9 +59,9 @@ static void got_ip_event_handler(void *arg, esp_event_base_t event_base,
                                  int32_t event_id, void *event_data)
 {
 
-    if(callback.got_ip_event_handler!=NULL)
+    if (callback.got_ip_event_handler != NULL)
     {
-        callback.got_ip_event_handler(arg,event_base,event_id,event_data);
+        callback.got_ip_event_handler(arg, event_base, event_id, event_data);
     }
 
     ip_event_got_ip_t *event = (ip_event_got_ip_t *) event_data;
@@ -78,7 +79,7 @@ static esp_eth_handle_t eth_handle = NULL;
 
 void ethernet_network_init(ethernet_network_callback_t cb)
 {
-    callback=cb;
+    callback = cb;
 
     esp_netif_config_t cfg = ESP_NETIF_DEFAULT_ETH();
     esp_netif_t *eth_netif = esp_netif_new(&cfg);
@@ -96,7 +97,7 @@ void ethernet_network_init(ethernet_network_callback_t cb)
     eth_esp32_emac_config_t esp32_emac_config = ETH_ESP32_EMAC_DEFAULT_CONFIG();
     esp32_emac_config.smi_mdc_gpio_num = CONFIG_ETHERNET_NETWORK_ETH_MDC_GPIO;
     esp32_emac_config.smi_mdio_gpio_num = CONFIG_ETHERNET_NETWORK_ETH_MDIO_GPIO;
-    esp_eth_mac_t *mac = esp_eth_mac_new_esp32(&esp32_emac_config,&mac_config);
+    esp_eth_mac_t *mac = esp_eth_mac_new_esp32(&esp32_emac_config, &mac_config);
 #if CONFIG_ETHERNET_NETWORK_ETH_PHY_IP101 == 1
     esp_eth_phy_t *phy = esp_eth_phy_new_ip101(&phy_config);
 #elif CONFIG_ETHERNET_NETWORK_ETH_PHY_RTL8201 == 1
@@ -113,7 +114,8 @@ void ethernet_network_init(ethernet_network_callback_t cb)
 #elif CONFIG_ETH_USE_SPI_ETHERNET == 1
     gpio_install_isr_service(0);
     spi_device_handle_t spi_handle = NULL;
-    spi_bus_config_t buscfg = {
+    spi_bus_config_t buscfg =
+    {
         .miso_io_num = CONFIG_ETHERNET_NETWORK_ETH_SPI_MISO_GPIO,
         .mosi_io_num = CONFIG_ETHERNET_NETWORK_ETH_SPI_MOSI_GPIO,
         .sclk_io_num = CONFIG_ETHERNET_NETWORK_ETH_SPI_SCLK_GPIO,
@@ -123,7 +125,8 @@ void ethernet_network_init(ethernet_network_callback_t cb)
     ESP_ERROR_CHECK(spi_bus_initialize(CONFIG_ETHERNET_NETWORK_ETH_SPI_HOST, &buscfg, 1));
 
 #if CONFIG_ETHERNET_NETWORK_USE_KSZ8851SNL == 1
-    spi_device_interface_config_t devcfg = {
+    spi_device_interface_config_t devcfg =
+    {
         .mode = 0,
         .clock_speed_hz = CONFIG_ETHERNET_NETWORK_ETH_SPI_CLOCK_MHZ * 1000 * 1000,
         .spics_io_num = CONFIG_ETHERNET_NETWORK_ETH_SPI_CS_GPIO,
@@ -136,7 +139,8 @@ void ethernet_network_init(ethernet_network_callback_t cb)
     esp_eth_mac_t *mac = esp_eth_mac_new_ksz8851snl(&ksz8851snl_config, &mac_config);
     esp_eth_phy_t *phy = esp_eth_phy_new_ksz8851snl(&phy_config);
 #elif CONFIG_ETHERNET_NETWORK_USE_DM9051 == 1
-    spi_device_interface_config_t devcfg = {
+    spi_device_interface_config_t devcfg =
+    {
         .command_bits = 1,
         .address_bits = 7,
         .mode = 0,
@@ -151,7 +155,8 @@ void ethernet_network_init(ethernet_network_callback_t cb)
     esp_eth_mac_t *mac = esp_eth_mac_new_dm9051(&dm9051_config, &mac_config);
     esp_eth_phy_t *phy = esp_eth_phy_new_dm9051(&phy_config);
 #elif CONFIG_ETHERNET_NETWORK_USE_W5500 == 1
-    spi_device_interface_config_t devcfg = {
+    spi_device_interface_config_t devcfg =
+    {
         .command_bits = 16, // Actually it's the address phase in W5500 SPI frame
         .address_bits = 8,  // Actually it's the control phase in W5500 SPI frame
         .mode = 0,
@@ -173,7 +178,8 @@ void ethernet_network_init(ethernet_network_callback_t cb)
     /* The SPI Ethernet module might doesn't have a burned factory MAC address, we cat to set it manually.
        02:00:00 is a Locally Administered OUI range so should not be used except when testing on a LAN under your control.
     */
-    ESP_ERROR_CHECK(esp_eth_ioctl(eth_handle, ETH_CMD_S_MAC_ADDR, (uint8_t[]) {
+    ESP_ERROR_CHECK(esp_eth_ioctl(eth_handle, ETH_CMD_S_MAC_ADDR, (uint8_t[])
+    {
         0x02, 0x00, 0x00, 0x12, 0x34, 0x56
     }));
 #endif

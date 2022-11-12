@@ -7,8 +7,8 @@
 
 static const char *TAG = "MQTT Client";
 
-mqttc_event_callback_t callback=NULL;
-mqttc_event_on_init_config_t on_config=NULL;
+mqttc_event_callback_t callback = NULL;
+mqttc_event_on_init_config_t on_config = NULL;
 
 /*
  * @brief Event handler registered to receive MQTT events
@@ -22,16 +22,17 @@ mqttc_event_on_init_config_t on_config=NULL;
  */
 static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
-    ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%" PRIu32 , base, event_id);
+    ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%" PRIu32, base, event_id);
     esp_mqtt_event_handle_t event = event_data;
-    if(callback!=NULL)
+    if (callback != NULL)
     {
-        if(callback(event_id,event))
+        if (callback(event_id, event))
         {
             return;//已处理直接返回
         }
     }
-    switch ((esp_mqtt_event_id_t)event_id) {
+    switch ((esp_mqtt_event_id_t)event_id)
+    {
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
         break;
@@ -64,20 +65,20 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 
 
 
-static esp_mqtt_client_handle_t client=NULL;
+static esp_mqtt_client_handle_t client = NULL;
 
 
 //启动mqtt
-void mqttc_start(mqttc_event_on_init_config_t on_cfg,mqttc_event_callback_t cb)
+void mqttc_start(mqttc_event_on_init_config_t on_cfg, mqttc_event_callback_t cb)
 {
 
-    if(client!=NULL)
+    if (client != NULL)
     {
         mqttc_stop();
     }
 
-    on_config=on_cfg;
-    callback=cb;
+    on_config = on_cfg;
+    callback = cb;
 
 
     esp_mqtt_client_config_t mqtt_cfg =
@@ -86,29 +87,29 @@ void mqttc_start(mqttc_event_on_init_config_t on_cfg,mqttc_event_callback_t cb)
     };
 
     //调整重试时间
-    mqtt_cfg.network.reconnect_timeout_ms=3000;
-    mqtt_cfg.network.disable_auto_reconnect=false;
+    mqtt_cfg.network.reconnect_timeout_ms = 3000;
+    mqtt_cfg.network.disable_auto_reconnect = false;
 
     {
         //内置emqx证书
-        const char *rc=NULL;
-        if((rc=(const char *)RCGetHandle("emqx/cacert.pem"))!=NULL)
+        const char *rc = NULL;
+        if ((rc = (const char *)RCGetHandle("emqx/cacert.pem")) != NULL)
         {
-            mqtt_cfg.broker.verification.use_global_ca_store=false;
-            mqtt_cfg.broker.verification.skip_cert_common_name_check=true;
-            mqtt_cfg.broker.verification.certificate=rc;
+            mqtt_cfg.broker.verification.use_global_ca_store = false;
+            mqtt_cfg.broker.verification.skip_cert_common_name_check = true;
+            mqtt_cfg.broker.verification.certificate = rc;
         }
-        if((rc=(const char *)RCGetHandle("emqx/client-cert.pem"))!=NULL)
+        if ((rc = (const char *)RCGetHandle("emqx/client-cert.pem")) != NULL)
         {
-            mqtt_cfg.credentials.authentication.certificate=rc;
+            mqtt_cfg.credentials.authentication.certificate = rc;
         }
-        if((rc=(const char *)RCGetHandle("emqx/client-key.pem"))!=NULL)
+        if ((rc = (const char *)RCGetHandle("emqx/client-key.pem")) != NULL)
         {
-            mqtt_cfg.credentials.authentication.key=rc;
+            mqtt_cfg.credentials.authentication.key = rc;
         }
     }
 
-    if(on_config!=NULL)
+    if (on_config != NULL)
     {
         on_config(&mqtt_cfg);
     }
@@ -124,11 +125,11 @@ void mqttc_start(mqttc_event_on_init_config_t on_cfg,mqttc_event_callback_t cb)
 void mqttc_stop()
 {
 
-    if(client!=NULL)
+    if (client != NULL)
     {
         esp_mqtt_client_stop(client);
         esp_mqtt_client_destroy(client);
-        client=NULL;
+        client = NULL;
     }
 
 }
@@ -136,9 +137,9 @@ void mqttc_stop()
 //publish mqtt消息(包装库函数)
 bool mqttc_publish(const char *topic, const char *data, int len, int qos, int retain)
 {
-    if(client!=NULL)
+    if (client != NULL)
     {
-        return 0<=esp_mqtt_client_publish(client,topic,data,len,qos,retain);
+        return 0 <= esp_mqtt_client_publish(client, topic, data, len, qos, retain);
     }
 
     return false;

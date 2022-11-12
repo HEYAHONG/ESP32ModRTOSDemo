@@ -21,14 +21,14 @@
 static const char *TAG = "esp32 main";
 
 #if CONFIG_WIFI_MESH_NETWORK == 1
-static wifimeshnet_callback_t meshcb={NULL,NULL,NULL};
+static wifimeshnet_callback_t meshcb = {NULL, NULL, NULL};
 #endif // CONFIG_WIFI_MESH_NETWORK
 
 #if CONFIG_ETHERNET_NETWORK == 1
-static ethernet_network_callback_t ethcb={NULL,NULL};
+static ethernet_network_callback_t ethcb = {NULL, NULL};
 #endif // CONFIG_ETHERNET_NETWORK
 
-static void main_task ()
+static void main_task()
 {
 
     system_init();
@@ -51,23 +51,23 @@ static void main_task ()
 
 #if CONFIG_NETWORK_PROTOCAL_MQTT == 1
 #if CONFIG_MQTT_CLIENT_ON_BOOT == 1
-    mqttc_start(NULL,NULL);
+    mqttc_start(NULL, NULL);
 #endif // CONFIG_MQTT_CLIENT_ON_BOOT
 #endif // CONFIG_NETWORK_PROTOCAL_MQTT
 
     app_init();
 
-    ESP_LOGI(TAG,"FreeMemory:%" PRIu32 " Bytes,Min FreeMemory:%" PRIu32 " Bytes ",esp_get_free_heap_size(),esp_get_minimum_free_heap_size());
+    ESP_LOGI(TAG, "FreeMemory:%" PRIu32 " Bytes,Min FreeMemory:%" PRIu32 " Bytes ", esp_get_free_heap_size(), esp_get_minimum_free_heap_size());
 
     while (1)
     {
         app_loop();
-        vTaskDelay (pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 
 }
 
-void app_main (void)
+void app_main(void)
 {
-    xTaskCreate (main_task, "main_task", 4096, NULL, 10, NULL);
+    xTaskCreate(main_task, "main_task", 4096, NULL, 10, NULL);
 }

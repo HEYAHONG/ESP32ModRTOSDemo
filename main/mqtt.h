@@ -12,12 +12,12 @@ extern "C"
 {
 #endif // __cplusplus
 
-typedef bool (*mqttc_event_callback_t)(esp_mqtt_event_id_t event_id,esp_mqtt_event_handle_t event);//返回true表示消息已处理，无需其它处理
+typedef bool (*mqttc_event_callback_t)(esp_mqtt_event_id_t event_id, esp_mqtt_event_handle_t event); //返回true表示消息已处理，无需其它处理
 typedef void (*mqttc_event_on_init_config_t)(esp_mqtt_client_config_t *mqtt_cfg);
 
 
 //启动mqtt
-void mqttc_start(mqttc_event_on_init_config_t on_cfg,mqttc_event_callback_t cb);
+void mqttc_start(mqttc_event_on_init_config_t on_cfg, mqttc_event_callback_t cb);
 
 //停止mqtt
 void mqttc_stop();

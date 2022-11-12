@@ -9,10 +9,10 @@ extern "C"
 #endif
 
 //通过名称获取资源大小
-size_t RCGetSize(const char * name);
+size_t RCGetSize(const char *name);
 
 //通过名称获取资源指针
-const unsigned char * RCGetHandle(const char * name);
+const unsigned char *RCGetHandle(const char *name);
 
 #ifdef __cplusplus
 };

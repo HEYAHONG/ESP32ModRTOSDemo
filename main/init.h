@@ -23,10 +23,10 @@ void system_init();
 void system_config_save();
 
 //添加配置item,添加后若原item不使用则需要用cJSON_Delete()释放原item。
-void system_config_put_item(cJSON *item,const char * name);
+void system_config_put_item(cJSON *item, const char *name);
 
 //获取配置item,使用完成后，需要使用cJSON_Delete()释放指针
-cJSON * system_config_get_item(const char *name);
+cJSON *system_config_get_item(const char *name);
 
 #ifdef __cplusplus
 }

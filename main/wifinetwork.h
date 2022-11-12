@@ -44,10 +44,10 @@ wifinetwork_state_t wifinetwork_getstate();
 
 #ifndef CONFIG_WIFI_NETWORK_SOFTAP
 //设置STA相关参数
-void wifinetwork_station_set_config(const char * ssid,const char * password);
+void wifinetwork_station_set_config(const char *ssid, const char *password);
 
 //启动smartconfig
-void wifinetwork_sta_smartconfg_start(smartconfig_type_t sctype,size_t timeout_s);
+void wifinetwork_sta_smartconfg_start(smartconfig_type_t sctype, size_t timeout_s);
 
 //停止smartconfig
 void wifinetwork_sta_smartconfg_stop();
@@ -56,7 +56,7 @@ void wifinetwork_sta_smartconfg_stop();
 
 #ifndef CONFIG_WIFI_NETWORK_STA
 //设置AP相关参数
-void wifinetwork_ap_set_config(const char * ssid,const char * password);
+void wifinetwork_ap_set_config(const char *ssid, const char *password);
 
 #endif // CONFIG_WIFI_NETWORK_STA
 
