@@ -64,6 +64,10 @@ ESP32支持以太网需要收发器,本人采用LAN8720作为收发器。对于E
 
 默认情况下,挂载的目录为/spiffs,具体参见 [main/init.c](main/init.c)
 
+## 测试截图
+
+![ESP32ModRTOSDemo-1](doc/ESP32ModRTOSDemo-1.png)
+
 # 编译
 
 ## 编译环境安装
