@@ -49,11 +49,6 @@ static void main_task()
     tftpd_start();
 #endif // LWIP_TFTPD_ON_BOOT
 
-#if CONFIG_NETWORK_PROTOCAL_MQTT == 1
-#if CONFIG_MQTT_CLIENT_ON_BOOT == 1
-    mqttc_start(NULL, NULL);
-#endif // CONFIG_MQTT_CLIENT_ON_BOOT
-#endif // CONFIG_NETWORK_PROTOCAL_MQTT
 
     app_init();
 

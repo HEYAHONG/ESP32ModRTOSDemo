@@ -1,14 +1,20 @@
+
+choice MQTT_CLIENT_STACK
+    bool "Choose MQTT Stack"
+    default  MQTT_CLIENT_USE_SMGS
+
+config MQTT_CLIENT_USE_SMGS
+    bool "Use SimpleMQTTGateWayStack"
+
+
+endchoice
+
+if MQTT_CLIENT_USE_SMGS
+
 config BROKER_URL
         string "Broker URL"
         default "mqtts://mqtt.hyhsystem.cn:8883"
         help
             URL of the broker to connect to
 
-config MQTT_CLIENT_USE_SMGS
-        bool "Use SimpleMQTTGateWayStack (AutoStart)"
-        default y
-        depends on !MQTT_CLIENT_ON_BOOT
-
-config MQTT_CLIENT_ON_BOOT
-        bool "start test client on boot (ONLY FOR TESTS)"
-        default n
+endif

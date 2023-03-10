@@ -68,6 +68,16 @@ ESP32支持以太网需要收发器,本人采用LAN8720作为收发器。对于E
 
 ![ESP32ModRTOSDemo-1](doc/ESP32ModRTOSDemo-1.png)
 
+### 以太网LAN8720
+
+以太网的Kconfig如下：
+
+![ETH-LAN8720-kconfig.png](doc/ETH-LAN8720-kconfig.png)
+
+monitor截图：
+
+![ETH-LAN8720-monitor.png](doc/ETH-LAN8720-monitor.png)
+
 # 编译
 
 ## 编译环境安装

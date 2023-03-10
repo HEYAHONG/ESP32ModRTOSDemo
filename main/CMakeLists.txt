@@ -1,6 +1,6 @@
-file(GLOB  SOURCE_C_CPP_FILES  *.c   *.cpp   mesh_netif/*.c mesh_netif/*.cpp  appstack/*.c appstack/*.cpp )
+file(GLOB  SOURCE_C_CPP_FILES  *.c *.h   *.cpp *.hpp   mesh_netif/*.c mesh_netif/*.h  mesh_netif/*.cpp mesh_netif/*.hpp     appstack/*.c appstack/*.h  appstack/*.cpp appstack/*.hpp  OneNetToken/*.c OneNetToken/*.h OneNetToken/*.cpp OneNetToken/*.hpp )
 set(COMPONENT_SRCS ${SOURCE_C_CPP_FILES})
-set(COMPONENT_ADD_INCLUDEDIRS "." "mesh_netif" "appstack" )
+set(COMPONENT_ADD_INCLUDEDIRS "." "mesh_netif" "appstack"  "OneNetToken")
 
 #默认框架中为启用tftp,在此处启用
 set(COMPONENT_SRCS ${COMPONENT_SRCS} tftp/tftp_server.c)
