@@ -96,7 +96,7 @@ monitor截图：
 
 ## 编译环境安装
 
-注意:仅支持github.com下载的代码，非github用户下载时不能下载子模块，下载后自行修改.gitmodules中esp-idf的url为https://github.com/espressif/esp-idf.git后再按照说明中源代码下载的方式同步子模块。
+注意:仅支持github.com下载的代码，非github用户下载时不能下载子模块，下载后自行修改.gitmodules中esp-idf的url为 https://github.com/espressif/esp-idf.git 后再按照说明中源代码下载的方式同步子模块。
 
 ### Linux / WSL
 
