@@ -78,6 +78,20 @@ monitor截图：
 
 ![ETH-LAN8720-monitor.png](doc/ETH-LAN8720-monitor.png)
 
+### 启用OneNET MQTT直连设备测试
+
+Kconfig如下：
+
+![OneNETDevice-kconfig](doc/OneNETDevice-kconfig.png)
+
+monitor截图：
+
+![OneNETDevice-monitor](doc/OneNETDevice-monitor.png)
+
+网站信息：
+
+![OneNETDevice-website](doc/OneNETDevice-website.png)
+
 # 编译
 
 ## 编译环境安装

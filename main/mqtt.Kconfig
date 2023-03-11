@@ -6,6 +6,9 @@ choice MQTT_CLIENT_STACK
 config MQTT_CLIENT_USE_SMGS
     bool "Use SimpleMQTTGateWayStack"
 
+config MQTT_CLIENT_USE_ONENET_DEVICE
+    bool "Use OneNETDevice"
+
 
 endchoice
 
@@ -14,6 +17,16 @@ if MQTT_CLIENT_USE_SMGS
 config BROKER_URL
         string "Broker URL"
         default "mqtts://mqtt.hyhsystem.cn:8883"
+        help
+            URL of the broker to connect to
+
+endif
+
+if MQTT_CLIENT_USE_ONENET_DEVICE
+
+config ONENET_BROKER_URL
+        string "Broker URL"
+        default "mqtts://studio-mqtts.heclouds.com:8883"
         help
             URL of the broker to connect to
 

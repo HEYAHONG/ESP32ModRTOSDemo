@@ -9,6 +9,10 @@
 void SMGS_Init();
 #endif // CONFIG_MQTT_CLIENT_USE_SMGS
 
+#ifdef CONFIG_MQTT_CLIENT_USE_ONENET_DEVICE
+void OneNETDevice_Init();
+#endif // CONFIG_MQTT_CLIENT_USE_ONENET_DEVICE
+
 static const char *TAG = "App";
 
 static uint8_t mac[6] = {0};
@@ -51,6 +55,10 @@ void app_init()
 #ifdef CONFIG_MQTT_CLIENT_USE_SMGS
     SMGS_Init();
 #endif // CONFIG_MQTT_CLIENT_USE_SMGS
+
+#ifdef CONFIG_MQTT_CLIENT_USE_ONENET_DEVICE
+    OneNETDevice_Init();
+#endif // CONFIG_MQTT_CLIENT_USE_ONENET_DEVICE
 
 }
 

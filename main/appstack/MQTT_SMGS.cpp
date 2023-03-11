@@ -5,10 +5,12 @@
 #include "libSMGS.h"
 #include <inttypes.h>
 
+#ifdef CONFIG_MQTT_CLIENT_USE_SMGS
+
+
 static const char *TAG = "MQTT_SMGS";
 
 
-#ifdef CONFIG_MQTT_CLIENT_USE_SMGS
 
 #include "mqtt.h"
 /*
