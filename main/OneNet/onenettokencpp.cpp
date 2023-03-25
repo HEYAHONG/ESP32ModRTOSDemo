@@ -21,13 +21,13 @@ std::string OneNETTokenGetSign(time_t _et,std::string res,std::string key,std::s
     std::string to_sign=et+"\n"+method+"\n"+res+"\n"+version;
     std::string key_bin;
     {
-        uint8_t key_blob[key.length()]= {0};
-        size_t key_blob_length=OneNETBase64Decode(key_blob,sizeof(key_blob),(uint8_t *)key.c_str(),key.length());
+        std::string key_blob=key;
+        size_t key_blob_length=OneNETBase64Decode((uint8_t *)key_blob.c_str(),key_blob.length(),(uint8_t *)key.c_str(),key.length());
         if(key_blob_length == 0)
         {
             return sign;
         }
-        key_bin=std::string((char *)key_blob,key_blob_length);
+        key_bin=std::string((char *)key_blob.c_str(),key_blob_length);
     }
     {
         uint8_t sign_blob[ONENET_HMAC_OUT_MAX]= {0};
