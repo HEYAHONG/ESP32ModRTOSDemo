@@ -274,7 +274,7 @@ bool OneNETOneJson::OnMQTTMessage(std::string topic,std::string payload)
                 {
                     id=reqjson["id"].asString();
                 }
-                if(OnServiceInvoke!=NULL)
+                if(OnServiceInvoke==NULL)
                 {
                     //不支持服务调用
                     return false;
