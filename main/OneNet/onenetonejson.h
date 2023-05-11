@@ -34,7 +34,7 @@ public:
     {
         std::string key;
         Json::Value value;
-        time_t timestamp;
+        uint64_t timestamp;
     } PropertyPostParam;
     bool PropertyPost(std::vector<PropertyPostParam> params,std::string id,OneJsonType type=ONENET_ONEJSON_TYPE_DEFAULT);
     void SetOnPropertyPostReply(std::function<void(std::string,int,std::string)> _OnPropertyPostReply);
@@ -44,7 +44,7 @@ public:
     {
         std::string identifier;
         std::vector<PropertyPostParam> value;
-        time_t timestamp;
+        uint64_t timestamp;
     } EventPostParam;
     bool EventPost(std::vector<EventPostParam> params,std::string id,OneJsonType type=ONENET_ONEJSON_TYPE_DEFAULT);
     void SetOnEventPostReply(std::function<void(std::string,int,std::string)> _OnEventPostReply);
@@ -63,7 +63,7 @@ public:
     typedef struct
     {
         Json::Value value;
-        time_t timestamp;
+        uint64_t timestamp;
     } HistoryPropertyValue;
     typedef struct
     {
@@ -73,7 +73,7 @@ public:
     typedef struct
     {
         std::vector<PropertyPostParam> value;
-        time_t timestamp;
+        uint64_t timestamp;
     } HistoryEventValue;
     typedef struct
     {
